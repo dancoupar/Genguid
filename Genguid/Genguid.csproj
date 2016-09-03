@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5F02464C-17A1-4D33-986C-D8788C70ABDB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Genguid</RootNamespace>
+    <AssemblyName>Genguid</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configuration\AppConfiguration.cs" />
+    <Compile Include="Configuration\GenerationLogConfigurationSection.cs" />
+    <Compile Include="Configuration\TypeLoaders\GenerationLogTypeLoader.cs" />
+    <Compile Include="Configuration\TypeLoaders\TypeLoader.cs" />
+    <Compile Include="Configuration\TypeLoaders\SettingsProviderTypeLoader.cs" />
+    <Compile Include="Configuration\TypeLoaders\FactoryTypeLoader.cs" />
+    <Compile Include="Configuration\FormatterConfigurationElement.cs" />
+    <Compile Include="Configuration\FormatterConfigurationElementCollection.cs" />
+    <Compile Include="Configuration\FormattersConfigurationSection.cs" />
+    <Compile Include="Configuration\FactoryConfigurationSection.cs" />
+    <Compile Include="Configuration\TypeLoaders\FormatterTypeLoader.cs" />
+    <Compile Include="Configuration\ISettingsProvider.cs" />
+    <Compile Include="Configuration\TypeLoaders\IFormatterTypeLoader.cs" />
+    <Compile Include="Configuration\TypeLoaders\ConfigurationTypeLoadException.cs" />
+    <Compile Include="Configuration\UserSettings.cs" />
+    <Compile Include="FactoryObservers\IGuidGenerationLogReader.cs" />
+    <Compile Include="FactoryObservers\IGuidGenerationLogWriter.cs" />
+    <Compile Include="FactoryObservers\JsonFileLogReader.cs" />
+    <Compile Include="FactoryObservers\JsonFileLogWriter.cs" />
+    <Compile Include="Formatters\LowerCaseGuidFormatter.cs" />
+    <Compile Include="Genguid.Designer.cs">
+      <DependentUpon>Genguid.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Factories\GuidDispatcher.cs" />
+    <Compile Include="Factories\IGuidFactoryObservable.cs" />
+    <Compile Include="Formatters\BracedGuidFormatter.cs" />
+    <Compile Include="Formatters\GuidFormatterDecorator.cs" />
+    <Compile Include="Formatters\ParenthesisedGuidFormatter.cs" />
+    <Compile Include="Formatters\UpperCaseGuidFormatter.cs" />
+    <Compile Include="Factories\CombGuidFactory.cs" />
+    <Compile Include="Formatters\CompactGuidFormatter.cs" />
+    <Compile Include="Formatters\HyphenatedGuidFormatter.cs" />
+    <Compile Include="Formatters\GuidFormatter.cs" />
+    <Compile Include="Factories\StandardGuidFactory.cs" />
+    <Compile Include="Factories\GuidFactory.cs" />
+    <Compile Include="FactoryObservers\IGuidFactoryObserver.cs" />
+    <Compile Include="FactoryObservers\JsonFileLog.cs" />
+    <Compile Include="FactoryObservers\GuidGenerationLog.cs" />
+    <Compile Include="Counting\GuidCounter.cs" />
+    <Compile Include="Counting\GuidCountStore.cs" />
+    <Compile Include="GuidPacket.cs" />
+    <Compile Include="Counting\IGuidCountStoreReader.cs" />
+    <Compile Include="Counting\IGuidCountStoreWriter.cs" />
+    <Compile Include="Counting\JsonFileGuidCountStoreReader.cs" />
+    <Compile Include="Counting\JsonFileGuidCountStore.cs" />
+    <Compile Include="Counting\JsonFileGuidCountStoreWriter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Genguid.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Genguid.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

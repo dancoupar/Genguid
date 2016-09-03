@@ -1,0 +1,338 @@
+﻿using Genguid.Configuration.TypeLoaders;
+using Genguid.Factories;
+using Genguid.FactoryObservers;
+using Genguid.Formatters;
+using System;
+using System.Collections.Specialized;
+using System.Linq;
+
+namespace Genguid.Configuration
+{
+	/// <summary>
+	/// Represents a user settings based settings provider.
+	/// </summary>
+	public class UserSettings : ISettingsProvider
+	{
+		private static readonly object settingsLock = new object();
+
+		private const string guidFactoryUserSetting = "guidFactory";
+		private const string guidFormattersUserSetting = "guidFormatters";
+
+		private ISettingsProvider defaultProvider;
+		private GuidFactory factory;
+		private GuidFormatter formatter;
+
+		/// <summary>
+		/// Creates a new instance of a user settings based settings provider, based on the current
+		/// provider.
+		/// </summary>
+		public UserSettings() : this(AppConfiguration.CurrentProvider)
+		{
+		}
+
+		/// <summary>
+		/// Creates a new instance of a user settings based settings provider, based on the
+		/// provider specified.
+		/// </summary>
+		/// <param name="defaultSettingsProvider">
+		/// The default settings provider from which the new instance should be based.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public UserSettings(ISettingsProvider defaultProvider)
+		{
+			if (defaultProvider == null)
+			{
+				throw new ArgumentNullException(nameof(defaultProvider), "Argument cannot be null.");
+			}
+
+			this.defaultProvider = defaultProvider;
+			
+			if (!this.HasValues())
+			{
+				this.CopyFrom(this.defaultProvider);
+			}
+			else
+			{
+				Type factoryType = this.ReadFactoryType();
+				Type[] formatterTypes = this.ReadFormatterTypes();
+
+				this.factory = FactoryTypeLoader.Current.Load(factoryType);
+				this.formatter = FormatterTypeLoader.Current.Load(formatterTypes);
+			}
+		}
+
+		/// <summary>
+		/// Gets the current GUID factory.
+		/// </summary>
+		public GuidFactory Factory
+		{
+			get
+			{
+				return this.factory;
+			}
+		}
+
+		/// <summary>
+		/// Gets the current GUID formatter. The formatter may decorate other formatters.
+		/// </summary>
+		public GuidFormatter Formatter
+		{
+			get
+			{
+				return this.formatter;
+			}
+		}
+
+		/// <summary>
+		/// Gets the current log for storing previously generated GUIDs.
+		/// </summary>
+		public GuidGenerationLog GenerationLog
+		{
+			get
+			{
+				// Generation log handling is delegated to the default provider
+				return this.defaultProvider.GenerationLog;
+			}
+		}
+
+		/// <summary>
+		/// Reads the settings and returns the <see cref="System.Type"/> associated with the
+		/// currently registered factory.
+		/// </summary>
+		public Type ReadFactoryType()
+		{
+			string factoryTypeName = Genguid.Default.guidFactory;
+
+			if (!String.IsNullOrEmpty(factoryTypeName))
+			{
+				return Type.GetType(factoryTypeName);
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Reads the settings and returns an array of <see cref="System.Type"/> objects associated
+		/// with the currently registered formatters.
+		/// </summary>
+		public Type[] ReadFormatterTypes()
+		{
+			// A lock is required since we don't want
+			// Genguid.Default.guidFormatters to change
+			// during execution of this method.
+
+			lock (settingsLock)
+			{
+				StringCollection formatters = Genguid.Default.guidFormatters;
+
+				if (formatters != null)
+				{
+					Type[] formatterTypes = new Type[Genguid.Default.guidFormatters.Count];
+					int index = 0;
+
+					foreach (string formatterTypeName in Genguid.Default.guidFormatters)
+					{
+						formatterTypes[index++] = Type.GetType(formatterTypeName);
+					}
+
+					return formatterTypes;
+				}
+
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Returns the <see cref="System.Type"/> associated with the currently registered GUID
+		/// generation log.
+		/// </summary>
+		public Type ReadGenerationLogType()
+		{
+			// Generation log handling is delegated to the default provider.
+			// No lock required.
+
+			return this.defaultProvider.ReadGenerationLogType();
+		}
+
+		/// <summary>
+		/// Registers the factory associated with the specified type, replacing the currently
+		/// registered factory. If the type is not valid, an exception will be thrown.
+		/// </summary>
+		/// <param name="factory">The <see cref="System.Type"/> of the factory to register.</param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RegisterFactory(Type factoryType)
+		{
+			// A lock is required since we don't want
+			// Genguid.Default.guidFactory to change
+			// between modification and Save.
+
+			lock (settingsLock)
+			{
+				if (factoryType == null)
+				{
+					throw new ArgumentNullException(nameof(factoryType), "Argument cannot be null.");
+				}
+
+				Genguid.Default.guidFactory = factoryType.AssemblyQualifiedName;
+				Genguid.Default.Save();
+
+				this.factory = FactoryTypeLoader.Current.Load(factoryType);
+			}
+		}
+
+		/// <summary>
+		/// Registers the formatter associated with the specified type, appending to the list of
+		/// currently registered formatters. If the type is not valid, an exception will be thrown.
+		/// </summary>
+		/// <param name="formatter">The <see cref="System.Type"/> of the formatter to register.</param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RegisterFormatter(Type formatterType)
+		{
+			// A lock is required since we don't want
+			// Genguid.Default.guidFormatters to change
+			// during execution of this method.
+
+			lock (settingsLock)
+			{
+				if (formatterType == null)
+				{
+					throw new ArgumentNullException(nameof(formatterType), "Argument cannot be null.");
+				}
+
+				if (Genguid.Default.guidFormatters == null || Genguid.Default.guidFormatters.Count == 0)
+				{
+					Genguid.Default.guidFormatters = new StringCollection();
+				}
+
+				Genguid.Default.guidFormatters.Add(formatterType.AssemblyQualifiedName);
+				Genguid.Default.Save();
+
+				this.formatter = FormatterTypeLoader.Current.Load(this.ReadFormatterTypes());
+			}
+		}
+
+		/// <summary>
+		/// De-registers the formatter associated with the specified type, removing it from the
+		/// list of currently registered formatters.
+		/// </summary>
+		/// <param name="formatter">The <see cref="System.Type"/> of the formatter to de-register.</param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void DeregisterFormatter(Type formatterType)
+		{
+			// A lock is required since we don't want
+			// Genguid.Default.guidFormatters to change
+			// during execution of this method.
+
+			lock (settingsLock)
+			{
+				if (formatterType == null)
+				{
+					throw new ArgumentNullException(nameof(formatterType), "Argument cannot be null.");
+				}
+
+				Type[] registeredFormatters = this.ReadFormatterTypes();
+
+				if (registeredFormatters.Contains(formatterType))
+				{
+					// Clear all currently registered formatters, then
+					// re-register all except the one we want to remove.
+
+					this.ClearFormatters();
+
+					foreach (Type registeredFormatterType in registeredFormatters)
+					{
+						if (!registeredFormatterType.Equals(formatterType))
+						{
+							this.RegisterFormatter(registeredFormatterType);
+						}
+					}
+				}
+
+				Genguid.Default.Save();
+			}
+		}
+
+		/// <summary>
+		/// Copies the settings provided by the specified provider onto this one.
+		/// </summary>
+		/// <param name="settingsProvider">The settings provider to copy settings from.</param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void CopyFrom(ISettingsProvider settingsProvider)
+		{
+			if (settingsProvider == null)
+			{
+				throw new ArgumentNullException(nameof(settingsProvider), "Argument cannot be null.");
+			}
+
+			// A lock is required since we don't want
+			// settings to change between modification
+			// and Save.
+
+			lock (settingsLock)
+			{
+				this.RegisterFactory(settingsProvider.ReadFactoryType());
+				this.ClearFormatters();
+
+				foreach (Type formatterType in settingsProvider.ReadFormatterTypes())
+				{
+					this.RegisterFormatter(formatterType);
+				}
+
+				Genguid.Default.Save();
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the user settings contain all necessary values.
+		/// </summary>
+		private bool HasValues()
+		{
+			Type factoryType = this.ReadFactoryType();
+			Type[] formatterTypes = this.ReadFormatterTypes();
+
+			if (factoryType != null && formatterTypes != null && formatterTypes.Length > 0)
+			{
+				return true;
+			}
+
+			return false;
+		}
+
+		private void ClearFormatters()
+		{
+			// A lock is required since we don't want
+			// Genguid.Default.guidFormatters to change
+			// between modification and Save.
+
+			lock (settingsLock)
+			{
+				// Clear the current list of formatters
+				Genguid.Default.guidFormatters = new StringCollection();
+				Genguid.Default.Save();
+			}
+		}
+
+		/// <summary>
+		/// Resets the settings to their default state.
+		/// </summary>
+		public void Reset()
+		{
+			// A lock is required since we don't want
+			// Genguid.Default changing between Reset
+			// and CopyFrom.
+
+			lock (settingsLock)
+			{
+				Genguid.Default.Reset();
+
+				// There is no direct relationship between the
+				// user settings (Genguid.settings) and the
+				// default settings defined in the App.config
+				// file, so need to reset the defaults from
+				// App.config manually.
+
+				this.CopyFrom(this.defaultProvider);
+			}
+		}
+	}
+}
