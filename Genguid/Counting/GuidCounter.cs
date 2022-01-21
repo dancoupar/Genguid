@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Counting
+﻿namespace Genguid.Counting
 {
 	/// <summary>
 	/// A counter for counting the number of GUIDs that have been previously generated. This class
@@ -17,12 +15,7 @@ namespace Genguid.Counting
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public GuidCounter(GuidCountStore store)
 		{
-			if (store == null)
-			{
-				throw new ArgumentNullException(nameof(store), "Argument cannot be null.");
-			}
-
-			this.store = store;
+			this.store = store ?? throw new ArgumentNullException(nameof(store), "Argument cannot be null."); ;
 		}
 
 		/// <summary>

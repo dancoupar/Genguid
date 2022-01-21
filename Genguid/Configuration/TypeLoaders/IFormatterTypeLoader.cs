@@ -1,5 +1,4 @@
 ﻿using Genguid.Formatters;
-using System;
 
 namespace Genguid.Configuration.TypeLoaders
 {

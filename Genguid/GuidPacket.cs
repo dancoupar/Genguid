@@ -1,5 +1,4 @@
 ﻿using Genguid.Configuration;
-using System;
 
 namespace Genguid
 {
@@ -108,17 +107,27 @@ namespace Genguid
 		/// equivalent.
 		/// </summary>
 		/// <param name="obj">An object to compare to this instance.</param>
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
-			if (obj is GuidPacket)
+			if (obj is GuidPacket packet)
 			{
 				return
-					((GuidPacket)obj).sequenceNumber.Equals(this.sequenceNumber) &&
-					((GuidPacket)obj).value.Equals(this.value) &&
-					((GuidPacket)obj).timestamp.Equals(this.timestamp);
+					packet.sequenceNumber.Equals(this.sequenceNumber) &&
+					packet.value.Equals(this.value) &&
+					packet.timestamp.Equals(this.timestamp);
 			}
 
 			return false;
+		}
+
+		public static bool operator ==(GuidPacket left, GuidPacket right)
+		{
+			return left.Equals(right);
+		}
+
+		public static bool operator !=(GuidPacket left, GuidPacket right)
+		{
+			return !(left == right);
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Formatters
+﻿namespace Genguid.Formatters
 {
 	/// <summary>
 	/// A decorator for a GUID formatter which can insert hyphens into formatted GUIDs. This class

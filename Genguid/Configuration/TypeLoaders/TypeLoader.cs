@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Configuration.TypeLoaders
+﻿namespace Genguid.Configuration.TypeLoaders
 {
 	/// <summary>
 	/// The default loader for creating instances from their corresponding types.
@@ -17,7 +15,7 @@ namespace Genguid.Configuration.TypeLoaders
 		/// <exception cref="Genguid.Configuration.TypeLoaders.ConfigurationTypeLoadException"></exception>
 		public virtual T Load(Type type)
 		{
-			if (type == null)
+			if (type is null)
 			{
 				throw new ArgumentNullException(nameof(type), "Argument cannot be null.");
 			}
@@ -38,7 +36,7 @@ namespace Genguid.Configuration.TypeLoaders
 				e is System.Runtime.InteropServices.COMException ||
 				e is System.TypeLoadException)
 			{
-				throw new ConfigurationTypeLoadException("", e);
+				throw new ConfigurationTypeLoadException($"Unable to create instance of type {type}.", e);
 			}
 		}
 	}

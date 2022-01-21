@@ -1,5 +1,4 @@
 ﻿using Genguid.Formatters;
-using System;
 
 namespace Genguid.Configuration.TypeLoaders
 {
@@ -44,12 +43,7 @@ namespace Genguid.Configuration.TypeLoaders
 		{
 			lock (instanceLock)
 			{
-				if (typeLoader == null)
-				{
-					throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null.");
-				}
-
-				instance = typeLoader;
+				instance = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null."); ;
 			}
 		}
 
@@ -72,7 +66,7 @@ namespace Genguid.Configuration.TypeLoaders
 		/// <exception cref="System.TypeLoadException"></exception>
 		public GuidFormatter Load(Type[] formatterTypes)
 		{
-			if (formatterTypes == null)
+			if (formatterTypes is null)
 			{
 				throw new ArgumentNullException(nameof(formatterTypes), "Argument cannot be null.");
 			}			

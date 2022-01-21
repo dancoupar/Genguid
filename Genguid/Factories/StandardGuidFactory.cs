@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Factories
+﻿namespace Genguid.Factories
 {
 	/// <summary>
 	/// A factory for generating standard GUIDs. This class cannot be inherited.

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Formatters
+﻿namespace Genguid.Formatters
 {
 	/// <summary>
 	/// Describes an object which can apply formatting to a globally-unique identifier.

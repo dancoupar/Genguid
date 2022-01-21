@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Configuration.TypeLoaders
+﻿namespace Genguid.Configuration.TypeLoaders
 {
 	public class ConfigurationTypeLoadException : TypeLoadException
 	{

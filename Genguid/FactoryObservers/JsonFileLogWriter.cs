@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.IO;
 
 namespace Genguid.FactoryObservers
 {
@@ -52,7 +50,7 @@ namespace Genguid.FactoryObservers
                     }
 
                     // Create and write JSON for GUID being logged
-                    streamWriter.WriteLine(this.CreateJson(packet));
+                    streamWriter.WriteLine(CreateJson(packet));
 
                     // Close JSON array
                     streamWriter.Write("]");
@@ -72,7 +70,7 @@ namespace Genguid.FactoryObservers
 			return streamWriter;
 		}
 
-		private string CreateJson(GuidPacket packet)
+		private static string CreateJson(GuidPacket packet)
 		{
 			return JsonConvert.SerializeObject(
 				new

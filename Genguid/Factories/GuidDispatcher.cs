@@ -1,6 +1,4 @@
 ﻿using Genguid.FactoryObservers;
-using System;
-using System.Collections.Generic;
 
 namespace Genguid.Factories
 {
@@ -27,7 +25,7 @@ namespace Genguid.Factories
 		/// <exception cref="System.InvalidOperationException"></exception>
 		public void RegisterObserver(IGuidFactoryObserver observer)
 		{
-			if (observer == null)
+			if (observer is null)
 			{
 				throw new ArgumentNullException(nameof(observer), "Argument cannot be null.");
 			}
@@ -48,7 +46,7 @@ namespace Genguid.Factories
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public void RemoveObserver(IGuidFactoryObserver observer)
 		{
-			if (observer == null)
+			if (observer is null)
 			{
 				throw new ArgumentNullException(nameof(observer), "Argument cannot be null.");
 			}

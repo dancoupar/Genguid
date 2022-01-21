@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Genguid.Counting
 {
@@ -20,12 +19,12 @@ namespace Genguid.Counting
 		/// </summary>
 		public JsonFileGuidCountStore()
 		{
-			string filePath = this.GetJsonFilePath();			
+			string filePath = GetJsonFilePath();			
 			this.writer = new JsonFileGuidCountStoreWriter(filePath);
 
 			if (!File.Exists(filePath))
 			{
-				this.CreateNewJsonCountFile(filePath);
+				this.CreateNewJsonCountFile();
 			}
 
 			// Reader will throw exception if file doesn't exist
@@ -54,13 +53,13 @@ namespace Genguid.Counting
 			}
 		}
 
-		private string GetJsonFilePath()
+		private static string GetJsonFilePath()
 		{
 			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;			
 			return Path.Combine(directoryPath, jsonFileName);
 		}
 
-		private void CreateNewJsonCountFile(string jsonFilePath)
+		private void CreateNewJsonCountFile()
 		{
 			// File creation itself is delegated to the writer
 			this.writer.Write(0);

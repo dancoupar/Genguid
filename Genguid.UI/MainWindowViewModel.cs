@@ -9,14 +9,14 @@ using System.Windows.Input;
 
 namespace Genguid.UI
 {
-    internal class MainWindowViewModel : INotifyPropertyChanged
+	internal class MainWindowViewModel : INotifyPropertyChanged
 	{
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
 		private string currentGuid = Guid.Empty.ToString("b");
 		private long sequenceNumber;
-		private ICommand previousGuidCommand;
-		private ICommand nextGuidCommand;
+		private readonly ICommand previousGuidCommand;
+		private readonly ICommand nextGuidCommand;
 
 		public MainWindowViewModel()
 		{
@@ -24,7 +24,7 @@ namespace Genguid.UI
 			this.nextGuidCommand = new DelegateCommand(this.NextGuid);
 		}
 
-		private GuidFactory Factory
+		private static GuidFactory Factory
 		{
 			get
 			{
@@ -32,7 +32,7 @@ namespace Genguid.UI
 			}
 		}
 
-		private GuidFormatter Formatter
+		private static GuidFormatter Formatter
 		{
 			get
 			{
@@ -82,10 +82,10 @@ namespace Genguid.UI
 
 		public void NextGuid()
 		{
-			this.Factory.GenerateNextGuid();
+			Factory.GenerateNextGuid();
 
-			this.currentGuid = this.Factory.CurrentGuid.FormattedValue;
-			this.sequenceNumber = this.Factory.CurrentGuid.SequenceNumber;
+			this.currentGuid = Factory.CurrentGuid.FormattedValue;
+			this.sequenceNumber = Factory.CurrentGuid.SequenceNumber;
 
 			this.ScrambleDigitsAsync();
 		}
@@ -97,10 +97,10 @@ namespace Genguid.UI
 			scrambleDigitsWorker.RunWorkerAsync();
 		}
 
-		private void ScrambleDigits(object sender, EventArgs e)
+		private void ScrambleDigits(object? sender, EventArgs e)
 		{
 			string originalString = this.currentGuid;
-			byte digitCount = this.Formatter.Digits;
+			byte digitCount = Formatter.Digits;
 			char[] chars = this.currentGuid.ToCharArray();
 
 			// Assign a random scramble time for each digit in ticks.
@@ -129,7 +129,7 @@ namespace Genguid.UI
 				{
 					if (!digitDone[i])
 					{
-						int digitIndex = this.FindDigitIndex(i);
+						int digitIndex = FindDigitIndex(i);
 
 						if (DateTime.Now.Ticks - startTicks < scrambleTimes[i])
 						{
@@ -153,10 +153,10 @@ namespace Genguid.UI
 			} while (doneCount < digitCount - 1);
 		}
 
-		private int FindDigitIndex(int nthDigit)
+		private static int FindDigitIndex(int nthDigit)
 		{
 			char templateChar = GuidFormatter.TemplateChar;
-			char[] templateString = this.Formatter.TemplateString.ToCharArray();
+			char[] templateString = Formatter.TemplateString.ToCharArray();
 			int digitCount = 0;
 
 			for (int i = 0; i < templateString.Length; i++)

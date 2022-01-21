@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Genguid.Factories
 {
@@ -15,8 +14,7 @@ namespace Genguid.Factories
 		protected override Guid Generate()
 		{
 			// Use a Win32 API function to generate a sequential GUID
-			Guid g;
-			UuidCreateSequential(out g);
+			UuidCreateSequential(out Guid g);
 
 			// Shuffle the bytes around to ensure the new GUID is consistent with what SQL Server would generate
 			byte[] bytes = g.ToByteArray();

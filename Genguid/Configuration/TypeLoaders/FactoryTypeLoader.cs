@@ -1,5 +1,4 @@
 ﻿using Genguid.Factories;
-using System;
 
 namespace Genguid.Configuration.TypeLoaders
 {
@@ -9,7 +8,7 @@ namespace Genguid.Configuration.TypeLoaders
 	/// </summary>
 	public sealed class FactoryTypeLoader : TypeLoader<GuidFactory>
 	{
-		private static readonly object instanceLock = new object();
+		private static readonly object instanceLock = new();
 		private static TypeLoader<GuidFactory> instance;
 
 		private FactoryTypeLoader()
@@ -41,12 +40,7 @@ namespace Genguid.Configuration.TypeLoaders
 		{
 			lock (instanceLock)
 			{
-				if (typeLoader == null)
-				{
-					throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null.");
-				}
-
-				instance = typeLoader;
+				instance = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null."); ;
 			}
 		}
 	}

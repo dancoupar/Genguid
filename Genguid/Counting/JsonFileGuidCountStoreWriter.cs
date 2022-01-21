@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace Genguid.Counting
+﻿namespace Genguid.Counting
 {
 	/// <summary>
 	/// A writer for writing the current GUID count to a JSON format text file. This class cannot be
@@ -9,7 +6,7 @@ namespace Genguid.Counting
 	/// </summary>
 	internal sealed class JsonFileGuidCountStoreWriter : IGuidCountStoreWriter
 	{
-		private static readonly object writeLock = new object();
+		private static readonly object writeLock = new();
 
 		private readonly string jsonFilePath;
 
@@ -20,12 +17,7 @@ namespace Genguid.Counting
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public JsonFileGuidCountStoreWriter(string jsonFilePath)
 		{
-			if (jsonFilePath == null)
-			{
-				throw new ArgumentNullException(nameof(jsonFilePath), "Argument cannot be null.");
-			}
-
-			this.jsonFilePath = jsonFilePath;
+			this.jsonFilePath = jsonFilePath ?? throw new ArgumentNullException(nameof(jsonFilePath), "Argument cannot be null.");
 		}
 
 		/// <summary>
@@ -38,10 +30,8 @@ namespace Genguid.Counting
 			{
 				try
 				{
-					using (StreamWriter streamWriter = this.GetStreamWriter())
-					{
-						streamWriter.WriteLine(count.ToString());
-					}
+					using StreamWriter streamWriter = this.GetStreamWriter();
+					streamWriter.WriteLine(count.ToString());
 				}
 				catch (Exception e)
 				{
@@ -52,8 +42,8 @@ namespace Genguid.Counting
 		
 		private StreamWriter GetStreamWriter()
 		{
-			FileStream fileStream = new FileStream(jsonFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-			StreamWriter streamWriter = new StreamWriter(fileStream);
+			var fileStream = new FileStream(jsonFilePath, FileMode.OpenOrCreate, FileAccess.Write);
+			var streamWriter = new StreamWriter(fileStream);
 
 			return streamWriter;
 		}

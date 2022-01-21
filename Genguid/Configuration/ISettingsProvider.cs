@@ -4,20 +4,20 @@ using Genguid.Formatters;
 
 namespace Genguid.Configuration
 {
-    /// <summary>
-    /// Describes an object which provides configuration settings for the app.
-    /// </summary>
-    public interface ISettingsProvider
+	/// <summary>
+	/// Describes an object which provides configuration settings for the app.
+	/// </summary>
+	public interface ISettingsProvider
 	{
 		/// <summary>
 		/// Gets the current GUID factory.
 		/// </summary>
-		GuidFactory? Factory { get; }
+		GuidFactory Factory { get; }
 
 		/// <summary>
 		/// Gets the current GUID formatter. The formatter may decorate other formatters.
 		/// </summary>
-		GuidFormatter? Formatter { get; }
+		GuidFormatter Formatter { get; }
 
 		/// <summary>
 		/// Gets the current log for storing previously generated GUIDs.

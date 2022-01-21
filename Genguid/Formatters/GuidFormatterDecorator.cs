@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Genguid.Formatters
+﻿namespace Genguid.Formatters
 {
 	/// <summary>
 	/// Describes an object which can decorate a GUID formatter.
@@ -19,12 +16,7 @@ namespace Genguid.Formatters
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public GuidFormatterDecorator(GuidFormatter baseFormatter)
 		{
-			if (baseFormatter == null)
-			{
-				throw new ArgumentNullException(nameof(baseFormatter), "Argument cannot be null.");
-			}
-
-			this.baseFormatter = baseFormatter;
+			this.baseFormatter = baseFormatter ?? throw new ArgumentNullException(nameof(baseFormatter), "Argument cannot be null."); ;
 		}
 
 		/// <summary>

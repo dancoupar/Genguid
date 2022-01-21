@@ -1,6 +1,5 @@
 ﻿using Genguid.Counting;
 using Genguid.FactoryObservers;
-using System;
 
 namespace Genguid.Factories
 {

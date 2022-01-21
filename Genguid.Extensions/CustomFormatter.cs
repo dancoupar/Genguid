@@ -1,6 +1,5 @@
 ﻿using Genguid.Configuration;
 using Genguid.Formatters;
-using System;
 
 namespace Genguid.Extensions
 {

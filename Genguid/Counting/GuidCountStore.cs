@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.Counting
+﻿namespace Genguid.Counting
 {
 	/// <summary>
 	/// Describes a store for the storing current GUID count.

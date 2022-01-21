@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.IO;
 
 namespace Genguid.Counting
 {
@@ -19,7 +17,7 @@ namespace Genguid.Counting
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public JsonFileGuidCountStoreReader(string jsonFilePath)
 		{
-			if (jsonFilePath == null)
+			if (jsonFilePath is null)
 			{
 				throw new ArgumentNullException(nameof(jsonFilePath), "Argument cannot be null.");
 			}

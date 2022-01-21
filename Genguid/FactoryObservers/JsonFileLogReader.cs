@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Genguid.FactoryObservers
+﻿namespace Genguid.FactoryObservers
 {
 	internal sealed class JsonFileLogReader : IGuidGenerationLogReader
 	{
@@ -8,12 +6,7 @@ namespace Genguid.FactoryObservers
 
 		public JsonFileLogReader(string logFilePath)
 		{
-			if (logFilePath == null)
-			{
-				throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null.");
-			}
-
-			this.logFilePath = logFilePath;
+			this.logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null."); ;
 		}
 
 		public GuidPacket Fetch(long sequenceNumber)

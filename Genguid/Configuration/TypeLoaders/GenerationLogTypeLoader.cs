@@ -8,8 +8,7 @@ namespace Genguid.Configuration.TypeLoaders
 	/// </summary>
 	public sealed class GenerationLogTypeLoader : TypeLoader<GuidGenerationLog>
 	{
-		private static readonly object instanceLock = new object();
-		private static TypeLoader<GuidGenerationLog> instance;
+		private readonly static TypeLoader<GuidGenerationLog> instance;
 
 		private GenerationLogTypeLoader()
 		{

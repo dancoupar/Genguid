@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Genguid.Formatters
+﻿namespace Genguid.Formatters
 {
 	/// <summary>
 	/// Represents a formatter which can format GUIDs as lowercase strings containing only those

@@ -2,10 +2,7 @@
 using Genguid.Factories;
 using Genguid.FactoryObservers;
 using Genguid.Formatters;
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 
 namespace Genguid.Configuration
 {
@@ -15,7 +12,10 @@ namespace Genguid.Configuration
 	/// </summary>
 	public sealed class AppConfiguration : ISettingsProvider
 	{
-		private static event EventHandler settingsProviderChanged;
+		/// <summary>
+		/// Occurs when the current settings provider for the app is changed.
+		/// </summary>
+		public static event EventHandler? SettingsProviderChanged;
 
 		private static readonly object instanceLock = new();
 		private static readonly object configLock = new();
@@ -25,13 +25,13 @@ namespace Genguid.Configuration
 		private const string guidFormattersConfigSection = "guidFormatters";
 		private const string guidGenerationLogConfigSection = "guidGenerationLog";
 
-		private GuidFactory factory;
-		private GuidFormatter formatter;
-		private GuidGenerationLog generationLog;
+		private GuidFactory factory = null!;
+		private GuidFormatter formatter = null!;
+		private GuidGenerationLog generationLog = null!;
 
-		private Type factoryType;
-		private IList<Type> formatterTypes;
-		private Type generationLogType;
+		private Type factoryType = null!;
+		private IList<Type> formatterTypes = null!;
+		private Type generationLogType = null!;
 
 		/// <summary>
 		/// Creates a new instance of a config file based settings provider.
@@ -94,34 +94,13 @@ namespace Genguid.Configuration
 		}
 
 		/// <summary>
-		/// Occurs when the current settings provider for the app is changed.
-		/// </summary>
-		public static event EventHandler SettingsProviderChanged
-		{
-			add
-			{
-				lock (instanceLock)
-				{
-					settingsProviderChanged += value;
-				}
-			}
-			remove
-			{
-				lock (instanceLock)
-				{
-					settingsProviderChanged -= value;
-				}
-			}
-		}
-
-		/// <summary>
 		/// Changes the current settings provider for the app to the one specified.
 		/// </summary>
 		/// <param name="settingsProvider">The new settings provider.</param>
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public static void SetCurrentProvider(ISettingsProvider settingsProvider)
 		{
-			if (settingsProvider == null)
+			if (settingsProvider is null)
 			{
 				throw new ArgumentNullException(nameof(settingsProvider), "Argument cannot be null.");
 			}
@@ -131,7 +110,7 @@ namespace Genguid.Configuration
 				currentProvider = settingsProvider;
 
 				// Trigger the settings provider changed event if there are any registered handlers
-				settingsProviderChanged?.Invoke(settingsProvider, EventArgs.Empty);
+				SettingsProviderChanged?.Invoke(settingsProvider, EventArgs.Empty);
 			}
 		}
 
@@ -145,7 +124,7 @@ namespace Genguid.Configuration
 			{
 				FactoryConfigurationSection factoryConfig = (FactoryConfigurationSection)ConfigurationManager.GetSection(guidFactoryConfigSection);
 
-				if (factoryConfig == null)
+				if (factoryConfig is null)
 				{
 					throw new ApplicationException(String.Format("There is no {0} section in app.config.", guidFactoryConfigSection));
 				}
@@ -164,9 +143,9 @@ namespace Genguid.Configuration
 			{
 				FormattersConfigurationSection formattersConfig = (FormattersConfigurationSection)ConfigurationManager.GetSection(guidFormattersConfigSection);
 
-				if (formattersConfig == null)
+				if (formattersConfig is null)
 				{
-					throw new NullReferenceException(String.Format("There is no {0} section in app.config.", guidFormattersConfigSection));
+					throw new ApplicationException(String.Format("There is no {0} section in app.config.", guidFormattersConfigSection));
 				}
 
 				Type[] formatterTypes = new Type[formattersConfig.Formatters.Count];
@@ -191,9 +170,9 @@ namespace Genguid.Configuration
 			{
 				GenerationLogConfigurationSection generationLogConfig = (GenerationLogConfigurationSection)ConfigurationManager.GetSection(guidGenerationLogConfigSection);
 
-				if (generationLogConfig == null)
+				if (generationLogConfig is null)
 				{
-					throw new NullReferenceException(String.Format("There is no {0} section in app.config.", guidGenerationLogConfigSection));
+					throw new ApplicationException(String.Format("There is no {0} section in app.config.", guidGenerationLogConfigSection));
 				}
 
 				return generationLogConfig.GenerationLogType;
@@ -204,7 +183,7 @@ namespace Genguid.Configuration
 		{
 			lock (configLock)
 			{
-				if (factoryType == null)
+				if (factoryType is null)
 				{
 					throw new ArgumentNullException(nameof(factoryType), "Argument cannot be null.");
 				}
@@ -217,7 +196,7 @@ namespace Genguid.Configuration
 		{
 			lock (configLock)
 			{
-				if (formatterType == null)
+				if (formatterType is null)
 				{
 					throw new ArgumentNullException(nameof(formatterType), "Argument cannot be null.");
 				}
@@ -231,7 +210,7 @@ namespace Genguid.Configuration
 		{
 			lock (configLock)
 			{
-				if (formatterType == null)
+				if (formatterType is null)
 				{
 					throw new ArgumentNullException(nameof(formatterType), "Argument cannot be null.");
 				}
@@ -259,7 +238,7 @@ namespace Genguid.Configuration
 		{
 			lock (configLock)
 			{
-				if (settings == null)
+				if (settings is null)
 				{
 					throw new ArgumentNullException(nameof(settings), "Argument cannot be null.");
 				}

@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Genguid.FactoryObservers
 {
@@ -20,12 +19,12 @@ namespace Genguid.FactoryObservers
 		/// </summary>
 		public JsonFileLog()
 		{
-			string filePath = this.GetLogFilePath();
+			string filePath = GetLogFilePath();
 
 			// Create a new, empty log file if one doesn't already exist
 			if (!File.Exists(filePath))
 			{
-				this.CreateEmptyLogFile(filePath);
+				CreateEmptyLogFile(filePath);
 			}
 
 			this.reader = new JsonFileLogReader(filePath);
@@ -54,13 +53,13 @@ namespace Genguid.FactoryObservers
 			}
 		}
 
-		private string GetLogFilePath()
+		private static string GetLogFilePath()
 		{
 			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 			return Path.Combine(directoryPath, logFileName);
 		}
 
-		private void CreateEmptyLogFile(string logFilePath)
+		private static void CreateEmptyLogFile(string logFilePath)
 		{
 			// Create a new empty file and immediately dispose of the resulting file stream
 			File.Create(logFilePath).Dispose();
