@@ -17,8 +17,8 @@ namespace Genguid.Configuration
 	{
 		private static event EventHandler settingsProviderChanged;
 
-		private static readonly object instanceLock = new object();
-		private static readonly object configLock = new object();
+		private static readonly object instanceLock = new();
+		private static readonly object configLock = new();
 		private static ISettingsProvider currentProvider;
 
 		private const string guidFactoryConfigSection = "guidFactory";
@@ -147,7 +147,7 @@ namespace Genguid.Configuration
 
 				if (factoryConfig == null)
 				{
-					throw new NullReferenceException(String.Format("There is no {0} section in app.config.", guidFactoryConfigSection));
+					throw new ApplicationException(String.Format("There is no {0} section in app.config.", guidFactoryConfigSection));
 				}
 
 				return factoryConfig.FactoryType;
@@ -245,12 +245,7 @@ namespace Genguid.Configuration
 		{
 			lock (configLock)
 			{
-				if (generationLogType == null)
-				{
-					throw new ArgumentNullException(nameof(generationLogType), "Argument cannot be null.");
-				}
-
-				this.generationLogType = generationLogType;
+                this.generationLogType = generationLogType ?? throw new ArgumentNullException(nameof(generationLogType), "Argument cannot be null.");
 				this.LoadGenerationLog();
 			}
 		}
@@ -269,17 +264,17 @@ namespace Genguid.Configuration
 					throw new ArgumentNullException(nameof(settings), "Argument cannot be null.");
 				}
 
-				this.RegisterFactory(settings.ReadFactoryType());
+				this.RegisterFactory(settings.ReadFactoryType()!);
 
 				// Clear all registered formatter types and re-register individually
 				this.formatterTypes.Clear();
 				
-				foreach (Type formatterType in settings.ReadFormatterTypes())
+				foreach (Type formatterType in settings.ReadFormatterTypes()!)
 				{
 					this.RegisterFormatter(formatterType);
 				}
 
-				this.RegisterGenerationLog(settings.ReadGenerationLogType());
+				this.RegisterGenerationLog(settings.ReadGenerationLogType()!);
 			}
 		}
 

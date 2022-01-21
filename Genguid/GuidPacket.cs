@@ -15,7 +15,7 @@ namespace Genguid
 		/// <summary>
 		/// Returns a non-initialised GUID packet representing the absence of a GUID.
 		/// </summary>
-		public static readonly GuidPacket NullPacket = new GuidPacket();
+		public static readonly GuidPacket NullPacket = new();
 		
 		/// <summary>
 		/// Creates a new GUID packet with the specified sequence number and value.
@@ -31,7 +31,7 @@ namespace Genguid
 				throw new ArgumentOutOfRangeException(nameof(sequenceNumber), sequenceNumber, "Argument must be greater than 0.");
 			}
 
-			if (value == default(Guid))
+			if (value == default)
 			{
 				throw new ArgumentException("Argument has not been initialised.", nameof(value));
 			}

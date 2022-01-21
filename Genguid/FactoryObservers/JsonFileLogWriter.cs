@@ -10,7 +10,7 @@ namespace Genguid.FactoryObservers
 	/// </summary>
 	internal sealed class JsonFileLogWriter : IGuidGenerationLogWriter
 	{
-		private static readonly object writeLock = new object();
+		private static readonly object writeLock = new();
 
 		private readonly string logFilePath;
 
@@ -20,12 +20,7 @@ namespace Genguid.FactoryObservers
 		/// <param name="logFilePath">A fully qualified path to the JSON log file.</param>
 		public JsonFileLogWriter(string logFilePath)
 		{
-			if (logFilePath == null)
-			{
-				throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null.");
-			}
-
-			this.logFilePath = logFilePath;
+            this.logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null.");
 		}
 
 		/// <summary>
@@ -38,32 +33,30 @@ namespace Genguid.FactoryObservers
 			{
 				try
 				{
-					using (StreamWriter streamWriter = this.CreateStreamWriter())
-					{
-						FileStream fileStream = streamWriter.BaseStream as FileStream;
+                    using StreamWriter streamWriter = this.CreateStreamWriter();
+					FileStream fileStream = (FileStream)streamWriter.BaseStream;
 
-						if (fileStream.Length == 0)
-						{
-							// New file; open JSON array
-							streamWriter.WriteLine("[");
-						}
-						else
-						{
-							// Existing file; remove the trailing ] and the final line break
-							fileStream.SetLength(fileStream.Length - 2);
+                    if (fileStream.Length == 0)
+                    {
+                        // New file; open JSON array
+                        streamWriter.WriteLine("[");
+                    }
+                    else
+                    {
+                        // Existing file; remove the trailing ] and the final line break
+                        fileStream.SetLength(fileStream.Length - 2);
 
-							// Move position to end of stream and write comma in preparation for next element in JSON array
-							fileStream.Position = fileStream.Length - 1;
-							streamWriter.WriteLine(",");
-						}
+                        // Move position to end of stream and write comma in preparation for next element in JSON array
+                        fileStream.Position = fileStream.Length - 1;
+                        streamWriter.WriteLine(",");
+                    }
 
-						// Create and write JSON for GUID being logged
-						streamWriter.WriteLine(this.CreateJson(packet));
+                    // Create and write JSON for GUID being logged
+                    streamWriter.WriteLine(this.CreateJson(packet));
 
-						// Close JSON array
-						streamWriter.Write("]");
-					}
-				}
+                    // Close JSON array
+                    streamWriter.Write("]");
+                }
 				catch (Exception e)
 				{
 					throw new ApplicationException("Error writing to log file. This is usually indicative of a corrupt log file.", e);
@@ -73,8 +66,8 @@ namespace Genguid.FactoryObservers
 
 		private StreamWriter CreateStreamWriter()
 		{
-			FileStream fileStream = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-			StreamWriter streamWriter = new StreamWriter(fileStream);
+			var fileStream = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
+			var streamWriter = new StreamWriter(fileStream);
 
 			return streamWriter;
 		}

@@ -56,7 +56,7 @@ namespace Genguid.Counting
 
 		private string GetJsonFilePath()
 		{
-			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);			
+			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;			
 			return Path.Combine(directoryPath, jsonFileName);
 		}
 

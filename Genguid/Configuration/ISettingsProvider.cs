@@ -1,24 +1,23 @@
 ﻿using Genguid.Factories;
 using Genguid.FactoryObservers;
 using Genguid.Formatters;
-using System;
 
 namespace Genguid.Configuration
 {
-	/// <summary>
-	/// Describes an object which provides configuration settings for the app.
-	/// </summary>
-	public interface ISettingsProvider
+    /// <summary>
+    /// Describes an object which provides configuration settings for the app.
+    /// </summary>
+    public interface ISettingsProvider
 	{
 		/// <summary>
 		/// Gets the current GUID factory.
 		/// </summary>
-		GuidFactory Factory { get; }
+		GuidFactory? Factory { get; }
 
 		/// <summary>
 		/// Gets the current GUID formatter. The formatter may decorate other formatters.
 		/// </summary>
-		GuidFormatter Formatter { get; }
+		GuidFormatter? Formatter { get; }
 
 		/// <summary>
 		/// Gets the current log for storing previously generated GUIDs.
@@ -28,19 +27,19 @@ namespace Genguid.Configuration
 		/// <summary>
 		/// Returns the <see cref="System.Type"/> associated with the currently registered factory.
 		/// </summary>
-		Type ReadFactoryType();
+		Type? ReadFactoryType();
 
 		/// <summary>
 		/// Returns an array of <see cref="System.Type"/> objects associated with the currently
 		/// registered formatters.
 		/// </summary>
-		Type[] ReadFormatterTypes();
+		Type[]? ReadFormatterTypes();
 
 		/// <summary>
 		/// Returns an array of <see cref="System.Type"/> objects associated with the currently
 		/// registered generation log.
 		/// </summary>
-		Type ReadGenerationLogType();
+		Type? ReadGenerationLogType();
 
 		/// <summary>
 		/// Registers the factory associated with the specified type, replacing the currently
@@ -71,8 +70,6 @@ namespace Genguid.Configuration
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
 		void DeregisterFormatter(Type formatterType);
-
-		void RegisterGenerationLog(Type generationLogType);
 
 		/// <summary>
 		/// Copies the settings provided by the specified provider onto this one.

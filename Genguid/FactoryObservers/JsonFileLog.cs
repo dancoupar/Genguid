@@ -56,7 +56,7 @@ namespace Genguid.FactoryObservers
 
 		private string GetLogFilePath()
 		{
-			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			string directoryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 			return Path.Combine(directoryPath, logFileName);
 		}
 

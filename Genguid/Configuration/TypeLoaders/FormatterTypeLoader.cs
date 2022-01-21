@@ -9,7 +9,7 @@ namespace Genguid.Configuration.TypeLoaders
 	/// </summary>
 	public sealed class FormatterTypeLoader : IFormatterTypeLoader
 	{
-		private static readonly object instanceLock = new object();
+		private static readonly object instanceLock = new();
 		private static IFormatterTypeLoader instance;
 
 		private readonly TypeLoader<GuidFormatter> baseTypeLoader;
@@ -83,7 +83,7 @@ namespace Genguid.Configuration.TypeLoaders
 			}
 
 			// The overall, decorated formatter
-			GuidFormatter formatter = null;
+			GuidFormatter formatter;
 
 			// Instantiate the base formatter
 			Type baseFormatterType = formatterTypes[0];			
@@ -111,7 +111,7 @@ namespace Genguid.Configuration.TypeLoaders
 
 				if (type.IsSubclassOf(typeof(GuidFormatterDecorator)))
 				{
-					formatter = (GuidFormatterDecorator)Activator.CreateInstance(type, formatter);
+					formatter = (GuidFormatterDecorator)Activator.CreateInstance(type, formatter)!;
 				}
 				else
 				{
@@ -125,7 +125,7 @@ namespace Genguid.Configuration.TypeLoaders
 				}
 			}
 
-			return formatter;
+			return formatter!;
 		}
 	}
 }

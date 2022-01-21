@@ -8,7 +8,7 @@ namespace Genguid.Extensions
 	{
 		public CustomFormatter(GuidFormatter baseFormatter) : base(baseFormatter)
 		{
-			AppConfiguration.CurrentProvider.Factory.RegisterObserver(new CustomObserver());			
+			AppConfiguration.CurrentProvider.Factory?.RegisterObserver(new CustomObserver());
 		}
 
 		public override string Format(Guid guid)

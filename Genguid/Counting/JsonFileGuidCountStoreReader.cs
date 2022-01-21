@@ -37,11 +37,11 @@ namespace Genguid.Counting
 		/// </summary>
 		public long Read()
 		{
-			string json = null;
+			string json;
 
 			using (StreamReader streamReader = this.CreateStreamReader())
 			{
-				json = streamReader.ReadLine();
+				json = streamReader.ReadLine()!;
 			}
 
 			return JsonConvert.DeserializeObject<long>(json);			
@@ -49,7 +49,7 @@ namespace Genguid.Counting
 
 		private StreamReader CreateStreamReader()
 		{
-			FileStream fileStream = new FileStream(this.jsonFilePath, FileMode.Open, FileAccess.Read);
+			var fileStream = new FileStream(this.jsonFilePath, FileMode.Open, FileAccess.Read);
 			return new StreamReader(fileStream);
 		}
 	}

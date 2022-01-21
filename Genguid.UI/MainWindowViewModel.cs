@@ -1,7 +1,7 @@
 ﻿using Genguid.Configuration;
 using Genguid.Factories;
 using Genguid.Formatters;
-using Microsoft.Practices.Prism.Commands;
+using Prism.Commands;
 using System;
 using System.ComponentModel;
 using System.Threading;
@@ -9,7 +9,7 @@ using System.Windows.Input;
 
 namespace Genguid.UI
 {
-	internal class MainWindowViewModel : INotifyPropertyChanged
+    internal class MainWindowViewModel : INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -92,7 +92,7 @@ namespace Genguid.UI
 
 		private void ScrambleDigitsAsync()
 		{
-			BackgroundWorker scrambleDigitsWorker = new BackgroundWorker();
+			var scrambleDigitsWorker = new BackgroundWorker();
 			scrambleDigitsWorker.DoWork += this.ScrambleDigits;
 			scrambleDigitsWorker.RunWorkerAsync();
 		}
@@ -106,7 +106,7 @@ namespace Genguid.UI
 			// Assign a random scramble time for each digit in ticks.
 			// Possible scramble time is between 0.3 and 0.6 seconds.
 
-			Random rng = new Random(DateTime.Now.Millisecond);
+			var rng = new Random(DateTime.Now.Millisecond);
 			long[] scrambleTimes = new long[digitCount];
 
 			for (int i = 0; i < digitCount; i++)

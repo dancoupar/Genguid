@@ -13,14 +13,14 @@ namespace Genguid.Configuration
 	/// </summary>
 	public class UserSettings : ISettingsProvider
 	{
-		private static readonly object settingsLock = new object();
+		private static readonly object settingsLock = new();
 
 		private const string guidFactoryUserSetting = "guidFactory";
 		private const string guidFormattersUserSetting = "guidFormatters";
 
 		private ISettingsProvider defaultProvider;
-		private GuidFactory factory;
-		private GuidFormatter formatter;
+		private GuidFactory? factory;
+		private GuidFormatter? formatter;
 
 		/// <summary>
 		/// Creates a new instance of a user settings based settings provider, based on the current
@@ -53,18 +53,25 @@ namespace Genguid.Configuration
 			}
 			else
 			{
-				Type factoryType = this.ReadFactoryType();
-				Type[] formatterTypes = this.ReadFormatterTypes();
+				Type? factoryType = this.ReadFactoryType();
+				Type[]? formatterTypes = this.ReadFormatterTypes();
 
-				this.factory = FactoryTypeLoader.Current.Load(factoryType);
-				this.formatter = FormatterTypeLoader.Current.Load(formatterTypes);
+				if (factoryType is not null)
+				{
+					this.factory = FactoryTypeLoader.Current.Load(factoryType);
+				}
+
+				if (formatterTypes is not null)
+				{
+					this.formatter = FormatterTypeLoader.Current.Load(formatterTypes);
+				}
 			}
 		}
 
 		/// <summary>
 		/// Gets the current GUID factory.
 		/// </summary>
-		public GuidFactory Factory
+		public GuidFactory? Factory
 		{
 			get
 			{
@@ -75,7 +82,7 @@ namespace Genguid.Configuration
 		/// <summary>
 		/// Gets the current GUID formatter. The formatter may decorate other formatters.
 		/// </summary>
-		public GuidFormatter Formatter
+		public GuidFormatter? Formatter
 		{
 			get
 			{
@@ -99,7 +106,7 @@ namespace Genguid.Configuration
 		/// Reads the settings and returns the <see cref="System.Type"/> associated with the
 		/// currently registered factory.
 		/// </summary>
-		public Type ReadFactoryType()
+		public Type? ReadFactoryType()
 		{
 			string factoryTypeName = Genguid.Default.guidFactory;
 
@@ -107,7 +114,7 @@ namespace Genguid.Configuration
 			{
 				return Type.GetType(factoryTypeName);
 			}
-
+			
 			return null;
 		}
 
@@ -115,7 +122,7 @@ namespace Genguid.Configuration
 		/// Reads the settings and returns an array of <see cref="System.Type"/> objects associated
 		/// with the currently registered formatters.
 		/// </summary>
-		public Type[] ReadFormatterTypes()
+		public Type[]? ReadFormatterTypes()
 		{
 			// A lock is required since we don't want
 			// Genguid.Default.guidFormatters to change
@@ -127,15 +134,15 @@ namespace Genguid.Configuration
 
 				if (formatters != null)
 				{
-					Type[] formatterTypes = new Type[Genguid.Default.guidFormatters.Count];
+					Type?[] formatterTypes = new Type[Genguid.Default.guidFormatters.Count];
 					int index = 0;
 
-					foreach (string formatterTypeName in Genguid.Default.guidFormatters)
+					foreach (string? formatterTypeName in Genguid.Default.guidFormatters)
 					{
-						formatterTypes[index++] = Type.GetType(formatterTypeName);
+						formatterTypes[index++] = Type.GetType(formatterTypeName!);
 					}
 
-					return formatterTypes;
+					return formatterTypes!;
 				}
 
 				return null;
@@ -146,7 +153,7 @@ namespace Genguid.Configuration
 		/// Returns the <see cref="System.Type"/> associated with the currently registered GUID
 		/// generation log.
 		/// </summary>
-		public Type ReadGenerationLogType()
+		public Type? ReadGenerationLogType()
 		{
 			// Generation log handling is delegated to the default provider.
 			// No lock required.
@@ -230,9 +237,9 @@ namespace Genguid.Configuration
 					throw new ArgumentNullException(nameof(formatterType), "Argument cannot be null.");
 				}
 
-				Type[] registeredFormatters = this.ReadFormatterTypes();
+				Type[]? registeredFormatters = this.ReadFormatterTypes();
 
-				if (registeredFormatters.Contains(formatterType))
+				if (registeredFormatters is not null && registeredFormatters.Contains(formatterType))
 				{
 					// Clear all currently registered formatters, then
 					// re-register all except the one we want to remove.
@@ -270,12 +277,23 @@ namespace Genguid.Configuration
 
 			lock (settingsLock)
 			{
-				this.RegisterFactory(settingsProvider.ReadFactoryType());
+				Type? factoryType = settingsProvider.ReadFactoryType();
+
+				if (factoryType is not null)
+				{
+					this.RegisterFactory(factoryType);
+				}
+
 				this.ClearFormatters();
 
-				foreach (Type formatterType in settingsProvider.ReadFormatterTypes())
+				Type[]? formatterTypes = settingsProvider.ReadFormatterTypes();
+
+				if (formatterTypes is not null)
 				{
-					this.RegisterFormatter(formatterType);
+					foreach (Type formatterType in formatterTypes)
+					{
+						this.RegisterFormatter(formatterType);
+					}
 				}
 
 				Genguid.Default.Save();
@@ -287,10 +305,10 @@ namespace Genguid.Configuration
 		/// </summary>
 		private bool HasValues()
 		{
-			Type factoryType = this.ReadFactoryType();
-			Type[] formatterTypes = this.ReadFormatterTypes();
+			Type? factoryType = this.ReadFactoryType();
+			Type[]? formatterTypes = this.ReadFormatterTypes();
 
-			if (factoryType != null && formatterTypes != null && formatterTypes.Length > 0)
+			if (factoryType is not null && formatterTypes is not null && formatterTypes.Length > 0)
 			{
 				return true;
 			}

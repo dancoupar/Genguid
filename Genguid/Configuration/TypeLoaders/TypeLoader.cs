@@ -24,7 +24,7 @@ namespace Genguid.Configuration.TypeLoaders
 
 			try
 			{
-				return (T)Activator.CreateInstance(type);
+				return (T)Activator.CreateInstance(type)!;
 			}
 			catch (Exception e) when (
 				e is System.ArgumentNullException ||
