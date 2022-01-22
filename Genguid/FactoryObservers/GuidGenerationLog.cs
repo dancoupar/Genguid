@@ -24,7 +24,9 @@
 		/// <summary>
 		/// Appends the specified GUID to the log.
 		/// </summary>
-		/// <param name="packet">A packet containing the information to append to the log.</param>
+		/// <param name="packet">
+		/// A packet containing the information to append to the log.
+		/// </param>
 		internal void Append(GuidPacket packet)
 		{
 			this.Writer.Append(packet);
@@ -33,7 +35,9 @@
 		/// <summary>
 		/// Fetches the previously generated GUID with the specified sequence number.
 		/// </summary>
-		/// <param name="sequenceNumber">The sequence number of the GUID to fetch.</param>
+		/// <param name="sequenceNumber">
+		/// The sequence number of the GUID to fetch.
+		/// </param>
 		public GuidPacket Fetch(long sequenceNumber)
 		{
 			return this.Reader.Fetch(sequenceNumber);

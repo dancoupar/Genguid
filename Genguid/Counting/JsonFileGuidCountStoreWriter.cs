@@ -1,4 +1,6 @@
-﻿namespace Genguid.Counting
+﻿using System.IO;
+
+namespace Genguid.Counting
 {
 	/// <summary>
 	/// A writer for writing the current GUID count to a JSON format text file. This class cannot be

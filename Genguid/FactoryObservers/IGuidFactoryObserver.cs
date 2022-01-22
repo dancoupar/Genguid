@@ -9,7 +9,9 @@
 		/// <summary>
 		/// Notifies the observer of a newly generated GUID.
 		/// </summary>
-		/// <param name="packet">A packet containing the information to append to the log.</param>
+		/// <param name="packet">
+		/// A packet containing the information to append to the log.
+		/// </param>
 		void NotifyOfGeneratedGuid(GuidPacket packet);
 	}
 }

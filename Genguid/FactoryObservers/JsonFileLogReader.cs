@@ -11,6 +11,7 @@
 
 		public GuidPacket Fetch(long sequenceNumber)
 		{
+			// Not yet implemented
 			return GuidPacket.NullPacket;
 		}
 	}
