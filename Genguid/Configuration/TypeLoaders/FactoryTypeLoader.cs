@@ -40,7 +40,7 @@ namespace Genguid.Configuration.TypeLoaders
 		{
 			lock (instanceLock)
 			{
-				instance = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null."); ;
+				instance = typeLoader ?? throw new ArgumentNullException(nameof(typeLoader), "Argument cannot be null.");
 			}
 		}
 	}

@@ -45,5 +45,16 @@ namespace Genguid {
                 this["guidFactory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection guidFactoryObservers {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["guidFactoryObservers"]));
+            }
+            set {
+                this["guidFactoryObservers"] = value;
+            }
+        }
     }
 }

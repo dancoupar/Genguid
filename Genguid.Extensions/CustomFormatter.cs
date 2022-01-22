@@ -1,5 +1,4 @@
-﻿using Genguid.Configuration;
-using Genguid.Formatters;
+﻿using Genguid.Formatters;
 
 namespace Genguid.Extensions
 {
@@ -7,7 +6,6 @@ namespace Genguid.Extensions
 	{
 		public CustomFormatter(GuidFormatter baseFormatter) : base(baseFormatter)
 		{
-			AppConfiguration.CurrentProvider.Factory?.RegisterObserver(new CustomObserver());
 		}
 
 		public override string Format(Guid guid)

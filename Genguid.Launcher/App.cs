@@ -1,5 +1,6 @@
 ﻿using Genguid.Configuration;
 using Genguid.Configuration.TypeLoaders;
+using Genguid.FactoryObservers;
 using Genguid.UI;
 using System.Windows;
 
@@ -34,6 +35,12 @@ namespace Genguid.Launcher
 
 			// Register the generation log as an observer of the factory
 			AppConfiguration.CurrentProvider.Factory.RegisterObserver(AppConfiguration.CurrentProvider.GenerationLog);
+
+			// Register any other configured observers
+			foreach (IGuidFactoryObserver factoryObserver in AppConfiguration.CurrentProvider.FactoryObservers)
+			{
+				AppConfiguration.CurrentProvider.Factory.RegisterObserver(factoryObserver);
+			}
 			
 			var wpfApp = new Application();
 			wpfApp.Run(new MainWindow());

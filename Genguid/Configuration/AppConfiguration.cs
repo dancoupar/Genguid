@@ -2,6 +2,7 @@
 using Genguid.Factories;
 using Genguid.FactoryObservers;
 using Genguid.Formatters;
+using System.Collections.ObjectModel;
 using System.Configuration;
 
 namespace Genguid.Configuration
@@ -23,13 +24,16 @@ namespace Genguid.Configuration
 
 		private const string guidFactoryConfigSection = "guidFactory";
 		private const string guidFormattersConfigSection = "guidFormatters";
+		private const string guidFactoryObserversConfigSection = "guidFactoryObservers";
 		private const string guidGenerationLogConfigSection = "guidGenerationLog";
 
 		private GuidFactory factory = null!;
-		private GuidFormatter formatter = null!;
+		private readonly IList<IGuidFactoryObserver> factoryObservers = null!;
+		private GuidFormatter formatter = null!;		
 		private GuidGenerationLog generationLog = null!;
 
 		private Type factoryType = null!;
+		private IList<Type> factoryObserverTypes = null!;
 		private IList<Type> formatterTypes = null!;
 		private Type generationLogType = null!;
 
@@ -38,6 +42,7 @@ namespace Genguid.Configuration
 		/// </summary>
 		private AppConfiguration()
 		{
+			this.factoryObservers = new List<IGuidFactoryObserver>();
 			this.Reset();
 		}
 
@@ -68,6 +73,17 @@ namespace Genguid.Configuration
 			get
 			{
 				return this.factory;
+			}
+		}
+
+		/// <summary>
+		/// Gets the list of currently registered factory observers.
+		/// </summary>
+		public IReadOnlyList<IGuidFactoryObserver> FactoryObservers
+		{
+			get
+			{
+				return new ReadOnlyCollection<IGuidFactoryObserver>(this.factoryObservers);
 			}
 		}
 
@@ -134,6 +150,33 @@ namespace Genguid.Configuration
 		}
 
 		/// <summary>
+		/// Returns an array of <see cref="System.Type"/> objects representing the default factory
+		/// observers for this settings provider.
+		/// </summary>
+		public Type[] ReadFactoryObserverTypes()
+		{
+			lock (configLock)
+			{
+				FactoryObserversConfigurationSection observersConfig = (FactoryObserversConfigurationSection)ConfigurationManager.GetSection(guidFactoryObserversConfigSection);
+
+				if (observersConfig is null)
+				{
+					throw new ApplicationException(String.Format("There is no {0} section in app.config.", guidFactoryObserversConfigSection));
+				}
+
+				Type[] factoryObserverTypes = new Type[observersConfig.FactoryObservers.Count];
+				int index = 0;
+
+				foreach (FactoryObserverConfigurationElement configElement in observersConfig.FactoryObservers)
+				{
+					factoryObserverTypes[index++] = configElement.FactoryObserverType;
+				}
+
+				return factoryObserverTypes;
+			}
+		}
+
+		/// <summary>
 		/// Returns an array of <see cref="System.Type"/> objects representing the default
 		/// formatters for this settings provider.
 		/// </summary>
@@ -158,7 +201,7 @@ namespace Genguid.Configuration
 
 				return formatterTypes;
 			}
-		}
+		}		
 
 		/// <summary>
 		/// Returns the <see cref="System.Type"/> representing the default generation log for this
@@ -189,6 +232,34 @@ namespace Genguid.Configuration
 				}
 
 				this.LoadFactory();
+			}
+		}
+
+		public void RegisterFactoryObserver(Type factoryObserverType)
+		{
+			lock (configLock)
+			{
+				if (factoryObserverType is null)
+				{
+					throw new ArgumentNullException(nameof(factoryObserverType), "Argument cannot be null.");
+				}
+
+				this.factoryObserverTypes.Add(factoryObserverType);
+				this.LoadFactoryObservers();
+			}
+		}
+
+		public void DeregisterFactoryObserver(Type factoryObserverType)
+		{
+			lock (configLock)
+			{
+				if (factoryObserverType is null)
+				{
+					throw new ArgumentNullException(nameof(factoryObserverType), "Argument cannot be null.");
+				}
+
+				this.factoryObserverTypes.Remove(factoryObserverType);
+				this.LoadFactoryObservers();
 			}
 		}
 
@@ -245,13 +316,21 @@ namespace Genguid.Configuration
 
 				this.RegisterFactory(settings.ReadFactoryType()!);
 
+				// Clear all registered observer types and re-register individually
+				this.factoryObserverTypes.Clear();
+				
+				foreach (Type factoryObserverType in settings.ReadFactoryObserverTypes()!)
+				{
+					this.RegisterFactoryObserver(factoryObserverType);
+				}
+
 				// Clear all registered formatter types and re-register individually
 				this.formatterTypes.Clear();
 				
 				foreach (Type formatterType in settings.ReadFormatterTypes()!)
 				{
 					this.RegisterFormatter(formatterType);
-				}
+				}				
 
 				this.RegisterGenerationLog(settings.ReadGenerationLogType()!);
 			}
@@ -273,6 +352,16 @@ namespace Genguid.Configuration
 				catch (ConfigurationTypeLoadException e)
 				{
 					throw new ApplicationException(String.Format("There is a misconfiguration in the {0} section of the App.config file.", guidFactoryConfigSection), e);
+				}
+
+				try
+				{
+					this.factoryObserverTypes = this.ReadFactoryObserverTypes().ToList();
+					this.LoadFactoryObservers();
+				}
+				catch (ConfigurationTypeLoadException e)
+				{
+					throw new ApplicationException(String.Format("There is a misconfiguration in the {0} section of the App.config file.", guidFactoryObserversConfigSection), e);
 				}
 
 				try
@@ -300,6 +389,16 @@ namespace Genguid.Configuration
 		private void LoadFactory()
 		{
 			this.factory = FactoryTypeLoader.Current.Load(factoryType);
+		}
+
+		private void LoadFactoryObservers()
+		{
+			this.factoryObservers.Clear();
+
+			foreach (Type factoryObserverType in this.factoryObserverTypes)
+			{
+				this.factoryObservers.Add(FactoryObserverTypeLoader.Current.Load(factoryObserverType));
+			}
 		}
 
 		private void LoadFormatters()

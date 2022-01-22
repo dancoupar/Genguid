@@ -15,6 +15,11 @@ namespace Genguid.Configuration
 		GuidFactory Factory { get; }
 
 		/// <summary>
+		/// Gets the list of currently registered factory observers.
+		/// </summary>
+		IReadOnlyList<IGuidFactoryObserver> FactoryObservers { get; }
+
+		/// <summary>
 		/// Gets the current GUID formatter. The formatter may decorate other formatters.
 		/// </summary>
 		GuidFormatter Formatter { get; }
@@ -28,6 +33,12 @@ namespace Genguid.Configuration
 		/// Returns the <see cref="System.Type"/> associated with the currently registered factory.
 		/// </summary>
 		Type? ReadFactoryType();
+
+		/// <summary>
+		/// Returns an array of <see cref="System.Type"/> objects associated with the currently
+		/// registered factory observers.
+		/// </summary>
+		Type[]? ReadFactoryObserverTypes();
 
 		/// <summary>
 		/// Returns an array of <see cref="System.Type"/> objects associated with the currently
@@ -45,17 +56,38 @@ namespace Genguid.Configuration
 		/// Registers the factory associated with the specified type, replacing the currently
 		/// registered factory. If the type is not valid, an exception will be thrown.
 		/// </summary>
-		/// <param name="factory">
+		/// <param name="factoryType">
 		/// The <see cref="System.Type"/> of the factory to register.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
 		void RegisterFactory(Type factoryType);
 
 		/// <summary>
+		/// Registers the factory observer associated with the specified type, appending to the
+		/// list of currently registered factory observers. If the type is not valid, an exception
+		/// will be thrown.
+		/// </summary>
+		/// <param name="factoryObserverType">
+		/// The <see cref="System.Type"/> of the factory observer to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		void RegisterFactoryObserver(Type factoryObserverType);
+
+		/// <summary>
+		/// De-registers the factory observer associated with the specified type, removing it from
+		/// the list of currently registered factory observers.
+		/// </summary>
+		/// <param name="factoryObserverType">
+		/// The <see cref="System.Type"/> of the factory observer to de-register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		void DeregisterFactoryObserver(Type factoryObserverType);
+
+		/// <summary>
 		/// Registers the formatter associated with the specified type, appending to the list of
 		/// currently registered formatters. If the type is not valid, an exception will be thrown.
 		/// </summary>
-		/// <param name="formatter">
+		/// <param name="formatterType">
 		/// The <see cref="System.Type"/> of the formatter to register.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
@@ -65,7 +97,7 @@ namespace Genguid.Configuration
 		/// De-registers the formatter associated with the specified type, removing it from the
 		/// list of currently registered formatters.
 		/// </summary>
-		/// <param name="formatter">
+		/// <param name="formatterType">
 		/// The <see cref="System.Type"/> of the formatter to de-register.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
