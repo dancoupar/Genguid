@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <OutputType>WinExe</OutputType>
     <UseWPF>True</UseWPF>
+    <ApplicationIcon>genguid.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="genguid.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Genguid\Genguid.csproj" />
