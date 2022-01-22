@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using Genguid.FactoryObservers;
 
-namespace Genguid.FactoryObservers
+namespace Genguid.Clipboard.FactoryObservers
 {
 	/// <summary>
 	/// A factory observer for writing generated GUIDs to the Windows clipboard.
@@ -15,7 +15,7 @@ namespace Genguid.FactoryObservers
 		/// </param>
 		public void NotifyOfGeneratedGuid(GuidPacket packet)
 		{
-			Clipboard.SetText(packet.FormattedValue);
+			System.Windows.Clipboard.SetText(packet.FormattedValue);
 		}
 	}
 }
