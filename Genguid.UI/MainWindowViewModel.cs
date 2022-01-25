@@ -150,7 +150,7 @@ namespace Genguid.UI
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
 
-			} while (doneCount < digitCount - 1);
+			} while (doneCount < digitCount);
 		}
 
 		private static int FindDigitIndex(int nthDigit)
