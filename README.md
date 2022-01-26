@@ -48,7 +48,7 @@ Formatters are classes that extend either the `GuidFormatter` (base formatters) 
 - `ParenthesisedGuidFormatter` - For wrapping generated GUIDs in parentheses.
 - `HyphenatedGuidFormatter` - For separating generated GUIDs into five groups separated by hyphens in the form 8-4-4-4-12.
 - `UpperCaseGuidFormatter` - For converting alpha characters within generated GUIDs to upper case.
-- `LowerCaseGuidFormatter` - For converting alpha characters within generated GUIDs to upper case.
+- `LowerCaseGuidFormatter` - For converting alpha characters within generated GUIDs to lower case.
 
 Think of formatters as a pipeline through which GUIDs will be fed and consider the order in which you configure them, for example:
 
