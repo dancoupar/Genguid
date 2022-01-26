@@ -4,7 +4,7 @@ Genguid is a glorified extensible GUID generator incorporating logging functiona
 # Getting Started
 Clone the repository in Visual Studio and build the solution to produce executables. There are two Windows-only executables which can be used to launch Genguid:
 
-- `Genguid.Launcher.exe` - Launches a WPF UI. New GUIDs can be generated using the *Next* button, and previously generated GUIDs can be retrieved using the *Previous* button.
+- `Genguid.Launcher.exe` - Launches a WPF UI. New GUIDs can be generated using the **Next** button, and previously generated GUIDs can be retrieved using the **Previous** button.
 - `Genguid.Clipboard.exe` - Generates a single GUID in 'headless' mode (no UI), writes the GUID to the Windows clipboard (as well as the configured log sink), then terminates.
 
 # Configuration
