@@ -32,8 +32,6 @@ namespace Genguid.Launcher
 		{
 			LaunchStarting?.Invoke(null, EventArgs.Empty);
 			
-			SetSettingsProvider(SettingsProviderTypeLoader.Current);
-
 			// Register the generation log as an observer of the factory
 			AppConfiguration.CurrentProvider.Factory.RegisterObserver(AppConfiguration.CurrentProvider.GenerationLog);
 
@@ -44,11 +42,6 @@ namespace Genguid.Launcher
 			}
 
 			LaunchCompleted?.Invoke(null, EventArgs.Empty);			
-		}
-
-		private static void SetSettingsProvider(TypeLoader<ISettingsProvider> typeLoader)
-		{
-			AppConfiguration.SetCurrentProvider(typeLoader.Load(typeof(UserSettings)));
 		}
 	}
 }
