@@ -26,8 +26,15 @@ There are two available factories:
 
 These are configured within the `App.config` as follows:
 
-- `<guidFactory name="StandardGuidFactory" type="Genguid.Factories.StandardGuidFactory, Genguid"/>`
-- `<guidFactory name="CombGuidFactory" type="Genguid.Factories.CombGuidFactory, Genguid"/>`
+**StandardGuidFactory**
+```
+<guidFactory name="StandardGuidFactory" type="Genguid.Factories.StandardGuidFactory, Genguid"/>
+```
+
+**CombGuidFactory**
+```
+<guidFactory name="CombGuidFactory" type="Genguid.Factories.CombGuidFactory, Genguid"/>
+```
 
 ### Factory Observers
 Factory observers are classes that implement the `IGuidFactoryObserver` interface. The following example illustrates how observers can be declared within the `App.config`:
@@ -42,7 +49,7 @@ Factory observers are classes that implement the `IGuidFactoryObserver` interfac
 Each time the configured factory generates a new GUID, each configured observer will be notified in the specified order via a call to its `NotifyOfGeneratedGuid` method.
 
 ### Formatters
-Formatters are classes that extend either the `GuidFormatter` (base formatters) or the `GuidFormatterDecorator` (decorator formatters) abstract class. There is one available base formatter, `CompactGuidFormatter`, and five decorators:
+Formatters are classes that extend either the `GuidFormatter` (base formatters) or the `GuidFormatterDecorator` (decorator formatters) abstract class. There is one available base formatter, `CompactGuidFormatter`, and five decorators. The base `CompactGuidFormatter` formatter produces a simple GUID of 32 hexadecimal characters. The decorators are:
 
 - `BracedGuidFormatter` - For wrapping generated GUIDs in curly braces.
 - `ParenthesisedGuidFormatter` - For wrapping generated GUIDs in parentheses.
@@ -56,11 +63,58 @@ Think of formatters as a pipeline through which GUIDs will be fed and consider t
 <guidFormatters>
   <clear/>
   <add name="CompactGuidFormatter" type="Genguid.Formatters.CompactGuidFormatter, Genguid"/>
+  <add name="UpperCaseGuidFormatter" type="Genguid.Formatters.LowerCaseGuidFormatter, Genguid"/>
   <add name="HyphenatedGuidFormatter" type="Genguid.Formatters.HyphenatedGuidFormatter, Genguid"/>
   <add name="BracedGuidFormatter" type="Genguid.Formatters.BracedGuidFormatter, Genguid"/>
-  <add name="LowerCaseGuidFormatter" type="Genguid.Formatters.LowerCaseGuidFormatter, Genguid"/>
 </guidFormatters>	
 ```
 
+### Generation Logs
+A generation log is a class that extends the abstract class `GuidGenerationLog`. A log must implement a `IGuidGenerationLogWriter` for recording newly generated GUIDs, as well as a `IGuidGenerationLogReader` for retrieving previously generated GUIDs. There is currently one available log, `JsonFileLog`, which is configured as follows:
 
+```
+<guidGenerationLog name="JsonFileLog" type="Genguid.FactoryObservers.JsonFileLog, Genguid"/>`
+```
 
+## Imperative Configuration
+The following code samples illustrate how custom extensions can be registered through code.
+
+### Factories
+To register a factory, run the following. This will replace the currently registered factory.
+
+```
+AppConfiguration.CurrentProvider.RegisterFactory(new CustomFactory());
+```
+
+### Factory Observers
+Observers can be registered as follows:
+
+```
+var observer = new CustomObserver();
+AppConfiguration.CurrentProvider.Factory.RegisterObserver(observer);
+```
+
+They can also be removed:
+
+```
+AppConfiguration.CurrentProvider.Factory.RemoveObserver(observer);
+```
+
+### Formatters
+Formatters can be registered as follows:
+
+```
+var formatter = new CustomFormatter();
+AppConfiguration.CurrentProvider.RegisterFormatter(formatter);
+```
+
+They can also be removed:
+
+```
+AppConfiguration.CurrentProvider.RemoveFormatter(formatter);
+```
+
+# User Settings
+When running the UI launcher, the current configuration will be copied from the `App.config` to a `user.config` file which is scoped to user running the program. The settings file is automatically stored in the user's `\AppData\Local` directory in Windows, under a subdirectory of `Genguid.Launcher`. Thereafter, these user settings will take precedence over whatever is defined in the `App.config` file when running the program as the same user. The eventual aim was to allow the user settings to be changed via the UI.
+
+To reset the settings back to whatever is defined in the `App.config`, the `user.config` file can be deleted. Alternatively, it can be hand edited in a text editor. Like the `App.config`, it's XML based and is fairly easy to follow.
