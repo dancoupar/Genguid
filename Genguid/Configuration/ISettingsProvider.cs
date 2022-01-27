@@ -63,6 +63,15 @@ namespace Genguid.Configuration
 		void RegisterFactory(Type factoryType);
 
 		/// <summary>
+		/// Registers the specified factory, replacing the currently registered one.
+		/// </summary>
+		/// <param name="factory">
+		/// The <see cref="GuidFactory"/> to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		void RegisterFactory(GuidFactory factory);
+
+		/// <summary>
 		/// Registers the factory observer associated with the specified type, appending to the
 		/// list of currently registered factory observers. If the type is not valid, an exception
 		/// will be thrown.
@@ -74,14 +83,14 @@ namespace Genguid.Configuration
 		void RegisterFactoryObserver(Type factoryObserverType);
 
 		/// <summary>
-		/// De-registers the factory observer associated with the specified type, removing it from
-		/// the list of currently registered factory observers.
+		/// Removes the factory observer associated with the specified type, removing it from the
+		/// list of currently registered factory observers.
 		/// </summary>
 		/// <param name="factoryObserverType">
-		/// The <see cref="System.Type"/> of the factory observer to de-register.
+		/// The <see cref="System.Type"/> of the factory observer to remove.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
-		void DeregisterFactoryObserver(Type factoryObserverType);
+		void RemoveFactoryObserver(Type factoryObserverType);
 
 		/// <summary>
 		/// Registers the formatter associated with the specified type, appending to the list of
@@ -94,14 +103,14 @@ namespace Genguid.Configuration
 		void RegisterFormatter(Type formatterType);
 
 		/// <summary>
-		/// De-registers the formatter associated with the specified type, removing it from the
-		/// list of currently registered formatters.
+		/// Removes the formatter associated with the specified type, removing it from the list of
+		/// currently registered formatters.
 		/// </summary>
 		/// <param name="formatterType">
-		/// The <see cref="System.Type"/> of the formatter to de-register.
+		/// The <see cref="System.Type"/> of the formatter to remove.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
-		void DeregisterFormatter(Type formatterType);
+		void RemoveFormatter(Type formatterType);
 
 		/// <summary>
 		/// Copies the settings provided by the specified provider onto this one.

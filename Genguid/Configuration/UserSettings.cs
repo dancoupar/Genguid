@@ -223,6 +223,29 @@ namespace Genguid.Configuration
 		}
 
 		/// <summary>
+		/// Registers the specified factory, replacing the currently registered one.
+		/// </summary>
+		/// <param name="factory">
+		/// The <see cref="GuidFactory"/> to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RegisterFactory(GuidFactory factory)
+		{
+			lock (settingsLock)
+			{
+				if (factory is null)
+				{
+					throw new ArgumentNullException(nameof(factory), "Argument cannot be null.");
+				}
+
+				Genguid.Default.guidFactory = factory.GetType().AssemblyQualifiedName;
+				Genguid.Default.Save();
+				
+				this.factory = factory;
+			}
+		}
+
+		/// <summary>
 		/// Registers the factory observer associated with the specified type, appending to the
 		/// list of currently registered factory observers. If the type is not valid, an exception
 		/// will be thrown.
@@ -257,14 +280,14 @@ namespace Genguid.Configuration
 		}
 
 		/// <summary>
-		/// De-registers the formatter associated with the specified type, removing it from the
-		/// list of currently registered formatters.
+		/// Removes the formatter associated with the specified type, removing it from the list of
+		/// currently registered formatters.
 		/// </summary>
 		/// <param name="factoryObserverType">
-		/// The <see cref="System.Type"/> of the formatter to de-register.
+		/// The <see cref="System.Type"/> of the formatter to remove.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
-		public void DeregisterFactoryObserver(Type factoryObserverType)
+		public void RemoveFactoryObserver(Type factoryObserverType)
 		{
 			// A lock is required since we don't want
 			// Genguid.Default.guidFactoryObservers to
@@ -334,14 +357,14 @@ namespace Genguid.Configuration
 		}
 
 		/// <summary>
-		/// De-registers the formatter associated with the specified type, removing it from the
-		/// list of currently registered formatters.
+		/// Removes the formatter associated with the specified type, removing it from the list of
+		/// currently registered formatters.
 		/// </summary>
 		/// <param name="formatterType">
-		/// The <see cref="System.Type"/> of the formatter to de-register.
+		/// The <see cref="System.Type"/> of the formatter to remove.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
-		public void DeregisterFormatter(Type formatterType)
+		public void RemoveFormatter(Type formatterType)
 		{
 			// A lock is required since we don't want
 			// Genguid.Default.guidFormatters to change

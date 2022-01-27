@@ -222,19 +222,53 @@ namespace Genguid.Configuration
 			}
 		}
 
+		/// <summary>
+		/// Registers the factory associated with the specified type, replacing the currently
+		/// registered factory. If the type is not valid, an exception will be thrown.
+		/// </summary>
+		/// <param name="factoryType">
+		/// The <see cref="System.Type"/> of the factory to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
 		public void RegisterFactory(Type factoryType)
 		{
 			lock (configLock)
-			{
-				if (factoryType is null)
-				{
-					throw new ArgumentNullException(nameof(factoryType), "Argument cannot be null.");
-				}
-
+			{				
+				this.factoryType = factoryType ?? throw new ArgumentNullException(nameof(factoryType), "Argument cannot be null.");
 				this.LoadFactory();
 			}
 		}
 
+		/// <summary>
+		/// Registers the specified factory, replacing the currently registered one.
+		/// </summary>
+		/// <param name="factory">
+		/// The <see cref="GuidFactory"/> to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RegisterFactory(GuidFactory factory)
+		{			
+			lock (configLock)
+			{
+				if (factory is null)
+				{
+					throw new ArgumentNullException(nameof(factory), "Argument cannot be null.");
+				}
+
+				this.factoryType = factory.GetType();
+				this.factory = factory;
+			}
+		}
+
+		/// <summary>
+		/// Registers the factory observer associated with the specified type, appending to the
+		/// list of currently registered factory observers. If the type is not valid, an exception
+		/// will be thrown.
+		/// </summary>
+		/// <param name="factoryObserverType">
+		/// The <see cref="System.Type"/> of the factory observer to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
 		public void RegisterFactoryObserver(Type factoryObserverType)
 		{
 			lock (configLock)
@@ -249,7 +283,15 @@ namespace Genguid.Configuration
 			}
 		}
 
-		public void DeregisterFactoryObserver(Type factoryObserverType)
+		/// <summary>
+		/// Removes the factory observer associated with the specified type, removing it from the
+		/// list of currently registered factory observers.
+		/// </summary>
+		/// <param name="factoryObserverType">
+		/// The <see cref="System.Type"/> of the factory observer to remove.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RemoveFactoryObserver(Type factoryObserverType)
 		{
 			lock (configLock)
 			{
@@ -263,6 +305,14 @@ namespace Genguid.Configuration
 			}
 		}
 
+		/// <summary>
+		/// Registers the formatter associated with the specified type, appending to the list of
+		/// currently registered formatters. If the type is not valid, an exception will be thrown.
+		/// </summary>
+		/// <param name="formatterType">
+		/// The <see cref="System.Type"/> of the formatter to register.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
 		public void RegisterFormatter(Type formatterType)
 		{
 			lock (configLock)
@@ -277,7 +327,15 @@ namespace Genguid.Configuration
 			}			
 		}
 
-		public void DeregisterFormatter(Type formatterType)
+		/// <summary>
+		/// Removes the formatter associated with the specified type, removing it from the list of
+		/// currently registered formatters.
+		/// </summary>
+		/// <param name="formatterType">
+		/// The <see cref="System.Type"/> of the formatter to remove.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void RemoveFormatter(Type formatterType)
 		{
 			lock (configLock)
 			{
@@ -288,10 +346,10 @@ namespace Genguid.Configuration
 				
 				this.formatterTypes.Remove(formatterType);
 				this.LoadFormatters();
-			}			
+			}
 		}
 
-		public void RegisterGenerationLog(Type generationLogType)
+		private void RegisterGenerationLog(Type generationLogType)
 		{
 			lock (configLock)
 			{
