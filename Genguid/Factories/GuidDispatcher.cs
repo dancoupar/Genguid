@@ -1,4 +1,5 @@
 ﻿using Genguid.FactoryObservers;
+using System.Collections.ObjectModel;
 
 namespace Genguid.Factories
 {
@@ -7,7 +8,7 @@ namespace Genguid.Factories
 	/// </summary>
 	internal class GuidDispatcher : IGuidFactoryObservable
 	{
-		private readonly ICollection<IGuidFactoryObserver> observers;
+		private readonly IList<IGuidFactoryObserver> observers;
 
 		/// <summary>
 		/// Creates a new instance of a GUID dispatcher.
@@ -15,6 +16,17 @@ namespace Genguid.Factories
 		public GuidDispatcher()
 		{
 			this.observers = new List<IGuidFactoryObserver>();
+		}
+
+		/// <summary>
+		/// Gets the list of currently registered observers.
+		/// </summary>
+		public IReadOnlyCollection<IGuidFactoryObserver> Observers
+		{
+			get
+			{
+				return new ReadOnlyCollection<IGuidFactoryObserver>(this.observers);
+			}
 		}
 
 		/// <summary>

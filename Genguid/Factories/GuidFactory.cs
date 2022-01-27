@@ -33,6 +33,17 @@ namespace Genguid.Factories
 		}
 
 		/// <summary>
+		/// Gets the list of currently registered observers.
+		/// </summary>
+		public IReadOnlyCollection<IGuidFactoryObserver> Observers
+		{
+			get
+			{
+				return this.dispatcher.Observers;
+			}
+		}
+
+		/// <summary>
 		/// Generates a new GUID, replacing the current one.
 		/// </summary>
 		public void GenerateNextGuid()
