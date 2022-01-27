@@ -104,17 +104,18 @@ AppConfiguration.CurrentProvider.Factory.RemoveObserver(observer);
 Formatters can be registered as follows:
 
 ```
-var formatter = new CustomFormatter();
-AppConfiguration.CurrentProvider.RegisterFormatter(formatter);
+AppConfiguration.CurrentProvider.RegisterFormatter(typeof(CustomFormatter));
 ```
 
 They can also be removed:
 
 ```
-AppConfiguration.CurrentProvider.RemoveFormatter(formatter);
+AppConfiguration.CurrentProvider.RemoveFormatter(typeof(CustomFormatter));
 ```
 
 # User Settings
 When running the UI launcher, the current configuration will be copied from the `App.config` to a `user.config` file which is scoped to user running the program. The settings file is automatically stored in the user's `\AppData\Local` directory in Windows, under a subdirectory of `Genguid.Launcher`. Thereafter, these user settings will take precedence over whatever is defined in the `App.config` file when running the program as the same user. The eventual aim was to allow the user settings to be changed via the UI.
 
 To reset the settings back to whatever is defined in the `App.config`, the `user.config` file can be deleted. Alternatively, it can be hand edited in a text editor. Like the `App.config`, it's XML based and is fairly easy to follow.
+
+User settings will not be copied in this way when running the headless `Genguid.Clipboard.exe`.
