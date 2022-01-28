@@ -1,18 +1,83 @@
-﻿namespace Genguid.FactoryObservers
+﻿using Newtonsoft.Json;
+
+namespace Genguid.FactoryObservers
 {
+	/// <summary>
+	/// A reader for retrieinvg previously generated GUIDs from a JSON format text file. This class
+	/// cannot be inherited.
+	/// </summary>
 	internal sealed class JsonFileLogReader : IGuidGenerationLogReader
 	{
-		private readonly string logFilePath;
+		private static readonly object readLock = new();
 
+		private readonly string logFilePath;
+		private readonly IDictionary<long, GuidPacket> cache;
+
+		/// <summary>
+		/// Creates a new instance of a JSON file log reader.
+		/// </summary>
+		/// <param name="logFilePath">
+		/// A fully qualified path to the JSON log file.
+		/// </param>
+		/// <exception cref="ArgumentNullException"></exception>
 		public JsonFileLogReader(string logFilePath)
 		{
-			this.logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null."); ;
+			this.logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null.");
+			this.cache = new Dictionary<long, GuidPacket>();
 		}
 
 		public GuidPacket Fetch(long sequenceNumber)
 		{
-			// Not yet implemented
-			return GuidPacket.NullPacket;
+			GuidPacket value = GuidPacket.NullPacket;
+
+			lock (readLock)
+			{
+				if (!this.cache.ContainsKey(sequenceNumber))
+				{
+					this.PopulateCache();
+				}
+
+				this.cache.TryGetValue(sequenceNumber, out value);
+			}
+
+			return value;
+		}
+
+		private void PopulateCache()
+		{
+			this.cache.Clear();
+
+			using StreamReader streamReader = this.CreateStreamReader();
+
+			var serializer = new JsonSerializer();
+			dynamic[]? jsonLog = (dynamic[]?)serializer.Deserialize(streamReader, typeof(dynamic[]));
+
+			if (jsonLog is null)
+			{
+				throw new ApplicationException("");
+			}
+
+			foreach (dynamic jsonLogEntry in jsonLog)
+			{
+				if (jsonLogEntry is null)
+				{
+					throw new ApplicationException("");
+				}
+
+				long number = jsonLogEntry.n;
+				Guid guid = jsonLogEntry.g;
+				DateTimeOffset timestamp = jsonLogEntry.t;
+
+				cache.Add(number, new GuidPacket(number, guid, timestamp));
+			}
+		}
+
+		private StreamReader CreateStreamReader()
+		{
+			var fileStream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read);
+			var streamReader = new StreamReader(fileStream);
+			
+			return streamReader;
 		}
 	}
 }

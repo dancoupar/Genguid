@@ -15,7 +15,7 @@ namespace Genguid
 		/// Returns a non-initialised GUID packet representing the absence of a GUID.
 		/// </summary>
 		public static readonly GuidPacket NullPacket = new();
-		
+
 		/// <summary>
 		/// Creates a new GUID packet with the specified sequence number and value.
 		/// </summary>
@@ -23,7 +23,19 @@ namespace Genguid
 		/// <param name="value">The GUID itself.</param>
 		/// <exception cref="System.ArgumentOutOfRangeException"></exception> 
 		/// <exception cref="System.ArgumentException"></exception>
-		public GuidPacket(long sequenceNumber, Guid value)
+		public GuidPacket(long sequenceNumber, Guid value) : this(sequenceNumber, value, DateTimeOffset.Now)
+		{
+		}
+
+		/// <summary>
+		/// Creates a new GUID packet with the specified sequence number and value.
+		/// </summary>
+		/// <param name="sequenceNumber">The sequence number of the GUID.</param>
+		/// <param name="value">The GUID itself.</param>
+		/// <param name="timestamp">The date and time the GUID was generated.</param>
+		/// <exception cref="System.ArgumentOutOfRangeException"></exception> 
+		/// <exception cref="System.ArgumentException"></exception>
+		public GuidPacket(long sequenceNumber, Guid value, DateTimeOffset timestamp)
 		{
 			if (sequenceNumber < 1)
 			{
@@ -37,7 +49,7 @@ namespace Genguid
 
 			this.sequenceNumber = sequenceNumber;
 			this.value = value;
-			this.timestamp = DateTimeOffset.Now;
+			this.timestamp = timestamp;
 		}
 
 		/// <summary>

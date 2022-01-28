@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System.IO;
 
 namespace Genguid.FactoryObservers
 {
 	/// <summary>
-	/// A writer for writing previously generated GUIDs to a JSON format text file. This calss
-	/// cannot be inherited.
+	/// A writer for writing newly generated GUIDs to a JSON format text file. This class cannot be
+	/// inherited.
 	/// </summary>
 	internal sealed class JsonFileLogWriter : IGuidGenerationLogWriter
 	{
@@ -14,9 +13,12 @@ namespace Genguid.FactoryObservers
 		private readonly string logFilePath;
 
 		/// <summary>
-		/// Creates a new instance of a JSON file based 
+		/// Creates a new instance of a JSON file log writer.
 		/// </summary>
-		/// <param name="logFilePath">A fully qualified path to the JSON log file.</param>
+		/// <param name="logFilePath">
+		/// A fully qualified path to the JSON log file.
+		/// </param>
+		/// <exception cref="ArgumentNullException"></exception>
 		public JsonFileLogWriter(string logFilePath)
 		{
             this.logFilePath = logFilePath ?? throw new ArgumentNullException(nameof(logFilePath), "Argument cannot be null.");
@@ -25,7 +27,9 @@ namespace Genguid.FactoryObservers
 		/// <summary>
 		/// Appends the specified GUID to the log.
 		/// </summary>
-		/// <param name="packet">A packet containing the information to append to the log.</param>
+		/// <param name="packet">
+		/// A packet containing the information to append to the log.
+		/// </param>
 		public void Append(GuidPacket packet)
 		{
 			lock (writeLock)

@@ -76,18 +76,24 @@ namespace Genguid.UI
 		{
 			this.sequenceNumber--;
 			this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
-
-			this.ScrambleDigitsAsync();
+			this.UpdateDisplayedGuid();
 		}
 
 		public void NextGuid()
 		{
-			Factory.GenerateNextGuid();
-
-			this.currentGuid = Factory.CurrentGuid.FormattedValue;
-			this.sequenceNumber = Factory.CurrentGuid.SequenceNumber;
-
-			this.ScrambleDigitsAsync();
+			if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
+			{
+				Factory.GenerateNextGuid();
+				this.currentGuid = Factory.CurrentGuid.FormattedValue;
+				this.sequenceNumber = Factory.CurrentGuid.SequenceNumber;
+				this.ScrambleDigitsAsync();
+			}
+			else
+			{
+				this.sequenceNumber++;
+				this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
+				this.UpdateDisplayedGuid();
+			}			
 		}
 
 		private void ScrambleDigitsAsync()
@@ -123,8 +129,6 @@ namespace Genguid.UI
 				// Keep the loop running at a sensible speed
 				Thread.Sleep(10);
 
-				int previousDigitIndex = 0;
-
 				for (int i = 0; i < digitCount; i++)
 				{
 					if (!digitDone[i])
@@ -141,14 +145,11 @@ namespace Genguid.UI
 							digitDone[i] = true;
 							doneCount++;
 						}
-
-						previousDigitIndex = digitIndex;
 					}
 				}
 
 				this.currentGuid = new string(chars);
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
+				this.UpdateDisplayedGuid();
 
 			} while (doneCount < digitCount);
 		}
@@ -173,6 +174,12 @@ namespace Genguid.UI
             }
 
 			return -1;
+		}
+
+		private void UpdateDisplayedGuid()
+		{
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
 		}
 	}
 }
