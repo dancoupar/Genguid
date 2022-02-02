@@ -6,15 +6,20 @@
         xmlns:local="clr-namespace:Genguid.UI"
         mc:Ignorable="d"
         Title="Genguid"
-		SizeToContent="WidthAndHeight">
+		Width="600px"
+		Height="220px"
+		MinHeight="170px"
+		MinWidth="300px" Background="#1c1c1c">
 	<Window.Resources>
 		<local:MainWindowViewModel x:Key="MainVM" />
 	</Window.Resources>
 	<Grid Margin="20,20,20,20" RenderTransformOrigin="0,0">
-		<StackPanel>
-			<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" />
-			<Label x:Name="guidLabel" Content="{Binding CurrentGuid, Mode=OneWay, Source={StaticResource MainVM}}" HorizontalAlignment="Left" Margin="30,30,30,80" FontFamily="#Oxygen Mono" FontSize="20pt" />
-		</StackPanel>
+		<Viewbox Stretch="Fill">
+			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+				<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" FontSize="10" Foreground="LawnGreen" />
+				<Label x:Name="guidLabel" Content="{Binding CurrentGuid, Mode=OneWay, Source={StaticResource MainVM}}" HorizontalAlignment="Left" Margin="0,0,0,40" FontFamily="#Oxygen Mono" FontSize="20" Foreground="LawnGreen" />
+			</StackPanel>
+		</Viewbox>
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
 			<Button x:Name="previousButton" Content="Previous" Height="30" Width="100" DockPanel.Dock="Right" Command="{Binding PreviousButtonClick, Mode=OneWay, Source={StaticResource MainVM}}"/>
 			<Button x:Name="nextButton" Content="Next" Padding="10,5,10,5" Margin="10,0,0,0" Height="30" Width="100" DockPanel.Dock="Right" Command="{Binding NextButtonClick, Mode=OneWay, Source={StaticResource MainVM}}"/>
