@@ -3,16 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Genguid.UI"
-        mc:Ignorable="d"
+        xmlns:local="clr-namespace:Genguid.UI" d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+		mc:Ignorable="d"
         Title="Genguid"
 		Width="600px"
 		Height="200px"
 		AllowsTransparency="true"
-		WindowStyle="None"
-		MouseDown="Window_MouseDown"
+		WindowStyle="None"		
 		BorderThickness="1"
-		BorderBrush="OrangeRed">
+		BorderBrush="OrangeRed"
+		ResizeMode="NoResize"
+		MouseDown="Window_MouseDown">
 	<Window.Resources>
 		<local:MainWindowViewModel x:Key="MainVM" />
 	</Window.Resources>
@@ -22,13 +23,14 @@
 	<Grid Margin="20,20,20,20" RenderTransformOrigin="0,0">
 		<Viewbox Stretch="Fill">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-				<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" FontSize="10" Foreground="OrangeRed" />
+				<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" FontSize="10" Foreground="Orange" />
 				<TextBox x:Name="guidBox" Background="Transparent" BorderThickness="0" Text="{Binding CurrentGuid, Mode=OneWay, Source={StaticResource MainVM}}" Margin="0,0,0,40" IsReadOnly="True" FontFamily="#Oxygen Mono" FontSize="20" Foreground="OrangeRed" />
 			</StackPanel>
 		</Viewbox>
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-			<Button x:Name="previousButton" Content="Previous" Height="30" Width="100" DockPanel.Dock="Right" Command="{Binding PreviousButtonClick, Mode=OneWay, Source={StaticResource MainVM}}"/>
-			<Button x:Name="nextButton" Content="Next" Padding="10,5,10,5" Margin="10,0,0,0" Height="30" Width="100" DockPanel.Dock="Right" Command="{Binding NextButtonClick, Mode=OneWay, Source={StaticResource MainVM}}"/>
+			<Button x:Name="copyButton" FontFamily="Segoe UI Symbol" Content="&#xE16F;" FontSize="20" Background="#1a1a1a" Foreground="Orange" Margin="0,0,10,0" Height="40" Width="40" DockPanel.Dock="Right" />
+			<Button x:Name="previousButton" FontFamily="Segoe UI Symbol" Content="&#xE112;" FontSize="20" Background="#1a1a1a" Foreground="Orange" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding PreviousButtonClickCommand, Mode=OneWay, Source={StaticResource MainVM}}"/>
+			<Button x:Name="nextButton" FontFamily="Segoe UI Symbol" Content="&#xE111;" FontSize="20" Background="#1a1a1a" Foreground="Orange" Margin="10,0,0,0" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding NextButtonClickCommand, Mode=OneWay, Source={StaticResource MainVM}}"/>
 		</StackPanel>
 	</Grid>
 </Window>

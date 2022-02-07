@@ -15,13 +15,13 @@ namespace Genguid.UI
 
 		private string currentGuid = Guid.Empty.ToString("b");
 		private long sequenceNumber;
-		private readonly ICommand previousGuidCommand;
-		private readonly ICommand nextGuidCommand;
+		private readonly ICommand previousCommand;
+		private readonly ICommand nextCommand;
 
 		public MainWindowViewModel()
 		{
-			this.previousGuidCommand = new DelegateCommand(this.PreviousGuid);
-			this.nextGuidCommand = new DelegateCommand(this.NextGuid);
+			this.previousCommand = new DelegateCommand(this.OnPrevious);
+			this.nextCommand = new DelegateCommand(this.OnNext);
 		}
 
 		private static GuidFactory Factory
@@ -54,32 +54,32 @@ namespace Genguid.UI
 			{
 				return this.currentGuid;
 			}
-		}
+		}		
 
-		public ICommand PreviousButtonClick
+		public ICommand PreviousButtonClickCommand
 		{
 			get
 			{
-				return this.previousGuidCommand;
+				return this.previousCommand;
 			}
 		}
 
-		public ICommand NextButtonClick
+		public ICommand NextButtonClickCommand
 		{
 			get
 			{
-				return this.nextGuidCommand;
+				return this.nextCommand;
 			}
-		}
+		}		
 
-		public void PreviousGuid()
+		private void OnPrevious()
 		{
 			this.sequenceNumber--;
 			this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
-			this.UpdateDisplayedGuid();
+			this.NotifyGuidChange();
 		}
 
-		public void NextGuid()
+		private void OnNext()
 		{
 			if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
 			{
@@ -92,7 +92,7 @@ namespace Genguid.UI
 			{
 				this.sequenceNumber++;
 				this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
-				this.UpdateDisplayedGuid();
+				this.NotifyGuidChange();
 			}			
 		}
 
@@ -149,7 +149,7 @@ namespace Genguid.UI
 				}
 
 				this.currentGuid = new string(chars);
-				this.UpdateDisplayedGuid();
+				this.NotifyGuidChange();
 
 			} while (doneCount < digitCount);
 		}
@@ -163,7 +163,7 @@ namespace Genguid.UI
 			for (int i = 0; i < templateString.Length; i++)
 			{
 				if (templateString[i] == templateChar)
-				{					
+				{
 					if (digitCount == nthDigit)
 					{
 						return i;
@@ -176,7 +176,7 @@ namespace Genguid.UI
 			return -1;
 		}
 
-		private void UpdateDisplayedGuid()
+		private void NotifyGuidChange()
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
