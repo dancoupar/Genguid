@@ -12,7 +12,7 @@
 		WindowStyle="None"
 		MouseDown="Window_MouseDown"
 		BorderThickness="1"
-		BorderBrush="LawnGreen">
+		BorderBrush="OrangeRed">
 	<Window.Resources>
 		<local:MainWindowViewModel x:Key="MainVM" />
 	</Window.Resources>
@@ -22,8 +22,8 @@
 	<Grid Margin="20,20,20,20" RenderTransformOrigin="0,0">
 		<Viewbox Stretch="Fill">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-				<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" FontSize="10" Foreground="LawnGreen" />
-				<TextBox x:Name="guidBox" Background="Transparent" BorderThickness="0" Text="{Binding CurrentGuid, Mode=OneWay, Source={StaticResource MainVM}}" Margin="0,0,0,40" IsReadOnly="True" FontFamily="#Oxygen Mono" FontSize="20" Foreground="LawnGreen" />
+				<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="#Oxygen Mono" FontSize="10" Foreground="OrangeRed" />
+				<TextBox x:Name="guidBox" Background="Transparent" BorderThickness="0" Text="{Binding CurrentGuid, Mode=OneWay, Source={StaticResource MainVM}}" Margin="0,0,0,40" IsReadOnly="True" FontFamily="#Oxygen Mono" FontSize="20" Foreground="OrangeRed" />
 			</StackPanel>
 		</Viewbox>
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
