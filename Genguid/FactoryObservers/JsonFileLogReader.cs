@@ -52,23 +52,21 @@ namespace Genguid.FactoryObservers
 			var serializer = new JsonSerializer();
 			dynamic[]? jsonLog = (dynamic[]?)serializer.Deserialize(streamReader, typeof(dynamic[]));
 
-			if (jsonLog is null)
+			if (jsonLog is not null)
 			{
-				throw new ApplicationException("");
-			}
-
-			foreach (dynamic jsonLogEntry in jsonLog)
-			{
-				if (jsonLogEntry is null)
+				foreach (dynamic jsonLogEntry in jsonLog)
 				{
-					throw new ApplicationException("");
+					if (jsonLogEntry is null)
+					{
+						throw new ApplicationException("");
+					}
+
+					long number = jsonLogEntry.n;
+					Guid guid = jsonLogEntry.g;
+					DateTimeOffset timestamp = jsonLogEntry.t;
+
+					cache.Add(number, new GuidPacket(number, guid, timestamp));
 				}
-
-				long number = jsonLogEntry.n;
-				Guid guid = jsonLogEntry.g;
-				DateTimeOffset timestamp = jsonLogEntry.t;
-
-				cache.Add(number, new GuidPacket(number, guid, timestamp));
 			}
 		}
 
