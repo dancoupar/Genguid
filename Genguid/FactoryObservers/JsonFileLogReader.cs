@@ -58,7 +58,7 @@ namespace Genguid.FactoryObservers
 				{
 					if (jsonLogEntry is null)
 					{
-						throw new ApplicationException("");
+						throw new ApplicationException("Unexpected null entry in log.");
 					}
 
 					long number = jsonLogEntry.n;
