@@ -79,5 +79,22 @@ namespace Genguid.Factories
 		/// Generates and returns a new GUID.
 		/// </summary>
 		protected abstract Guid Generate();
+
+		/// <summary>
+		/// Restores the current GUID using the specified log.
+		/// </summary>
+		/// <param name="log">
+		/// The log from which to restore the current GUID.
+		/// </param>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		public void Restore(GuidGenerationLog log)
+		{
+			if (log is null)
+			{
+				throw new ArgumentNullException(nameof(log), "Argument cannot be null.");
+			}
+
+			this.currentGuid = log.Fetch(this.counter.Count());
+		}
 	}
 }

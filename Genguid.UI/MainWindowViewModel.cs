@@ -22,6 +22,9 @@ namespace Genguid.UI
 		{
 			this.previousCommand = new DelegateCommand(this.OnPrevious);
 			this.nextCommand = new DelegateCommand(this.OnNext);
+
+			AppConfiguration.CurrentProvider.Factory.Restore(AppConfiguration.CurrentProvider.GenerationLog);
+			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid);
 		}
 
 		private static GuidFactory Factory
@@ -75,8 +78,7 @@ namespace Genguid.UI
 		private void OnPrevious()
 		{
 			this.sequenceNumber--;
-			this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
-			this.NotifyGuidChange();
+			this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
 		}
 
 		private void OnNext()
@@ -84,15 +86,13 @@ namespace Genguid.UI
 			if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
 			{
 				Factory.GenerateNextGuid();
-				this.currentGuid = Factory.CurrentGuid.FormattedValue;
-				this.sequenceNumber = Factory.CurrentGuid.SequenceNumber;
+				this.SetGuid(Factory.CurrentGuid);
 				this.ScrambleDigitsAsync();
 			}
 			else
 			{
 				this.sequenceNumber++;
-				this.currentGuid = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber).FormattedValue;
-				this.NotifyGuidChange();
+				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
 			}			
 		}
 
@@ -149,7 +149,7 @@ namespace Genguid.UI
 				}
 
 				this.currentGuid = new string(chars);
-				this.NotifyGuidChange();
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 
 			} while (doneCount < digitCount);
 		}
@@ -176,8 +176,11 @@ namespace Genguid.UI
 			return -1;
 		}
 
-		private void NotifyGuidChange()
+		private void SetGuid(GuidPacket guidPacket)
 		{
+			this.currentGuid = guidPacket.FormattedValue;
+			this.sequenceNumber = guidPacket.SequenceNumber;
+
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
 		}
