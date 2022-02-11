@@ -17,6 +17,7 @@ namespace Genguid.UI
 		private long sequenceNumber;
 		private readonly ICommand previousCommand;
 		private readonly ICommand nextCommand;
+		private bool digitsScrambling;
 
 		public MainWindowViewModel()
 		{
@@ -77,35 +78,50 @@ namespace Genguid.UI
 
 		private void OnPrevious()
 		{
-			this.sequenceNumber--;
-			this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
+			if (!digitsScrambling)
+			{
+				this.sequenceNumber--;
+				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
+			}
 		}
 
 		private void OnNext()
 		{
-			if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
+			if (!digitsScrambling)
 			{
-				Factory.GenerateNextGuid();
-				this.SetGuid(Factory.CurrentGuid);
-				this.ScrambleDigitsAsync();
+				if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
+				{
+					Factory.GenerateNextGuid();
+					this.SetGuid(Factory.CurrentGuid);
+					this.ScrambleDigitsAsync();
+				}
+				else
+				{
+					this.sequenceNumber++;
+					this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
+				}
 			}
-			else
-			{
-				this.sequenceNumber++;
-				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
-			}			
 		}
 
 		private void ScrambleDigitsAsync()
 		{
+			// Scramble the digits without locking the UI thread.
+			// The flag prevents the GUID changing further whilst
+			// scrambling is taking place, avoiding race conditions.
+
+			digitsScrambling = true;
 			using var scrambleDigitsWorker = new BackgroundWorker();
 			scrambleDigitsWorker.DoWork += this.ScrambleDigits;
 			scrambleDigitsWorker.RunWorkerAsync();
+			scrambleDigitsWorker.RunWorkerCompleted += (_, _) =>
+			{
+				digitsScrambling = false;
+			};
 		}
 
 		private void ScrambleDigits(object? sender, EventArgs e)
 		{
-			string originalString = this.currentGuid;
+			string targetString = this.currentGuid;
 			byte digitCount = Formatter.Digits;
 			char[] chars = this.currentGuid.ToCharArray();
 
@@ -141,7 +157,7 @@ namespace Genguid.UI
 						}
 						else
 						{
-							chars[digitIndex] = originalString[digitIndex];
+							chars[digitIndex] = targetString[digitIndex];
 							digitDone[i] = true;
 							doneCount++;
 						}
