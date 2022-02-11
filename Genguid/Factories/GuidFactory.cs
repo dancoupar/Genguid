@@ -1,5 +1,4 @@
-﻿using Genguid.Counting;
-using Genguid.FactoryObservers;
+﻿using Genguid.FactoryObservers;
 
 namespace Genguid.Factories
 {
@@ -10,7 +9,6 @@ namespace Genguid.Factories
 	{
 		private GuidPacket currentGuid;
 		private readonly GuidDispatcher dispatcher;
-		private readonly GuidCounter counter;
 
 		/// <summary>
 		/// Creates a new instance of a GUID factory.
@@ -18,7 +16,6 @@ namespace Genguid.Factories
 		public GuidFactory()
 		{
 			this.dispatcher = new GuidDispatcher();
-			this.counter = new GuidCounter(new JsonFileGuidCountStore());
 		}
 
 		/// <summary>
@@ -48,8 +45,8 @@ namespace Genguid.Factories
 		/// </summary>
 		public void GenerateNextGuid()
 		{
-			this.counter.Increment();
-			this.currentGuid = new GuidPacket(this.counter.Count(), this.Generate());
+			long currentCount = this.currentGuid.SequenceNumber;
+			this.currentGuid = new GuidPacket(currentCount + 1, this.Generate());
 			this.dispatcher.NotifyObservers(this.currentGuid);
 		}
 
@@ -81,10 +78,10 @@ namespace Genguid.Factories
 		protected abstract Guid Generate();
 
 		/// <summary>
-		/// Restores the current GUID using the specified log.
+		/// Restores the most recently generated GUID using the specified log.
 		/// </summary>
 		/// <param name="log">
-		/// The log from which to restore the current GUID.
+		/// The log from which to restore the most recently generated GUID.
 		/// </param>
 		/// <exception cref="System.ArgumentNullException"></exception>
 		public void Restore(GuidGenerationLog log)
@@ -94,7 +91,7 @@ namespace Genguid.Factories
 				throw new ArgumentNullException(nameof(log), "Argument cannot be null.");
 			}
 
-			this.currentGuid = log.Fetch(this.counter.Count());
+			this.currentGuid = log.Fetch();
 		}
 	}
 }

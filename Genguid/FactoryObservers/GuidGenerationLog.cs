@@ -33,6 +33,15 @@
 		}
 
 		/// <summary>
+		/// Retrieves a packet containing the most recently generated GUID and its associated
+		/// meta-data from the log.
+		/// </summary>
+		public GuidPacket Fetch()
+		{
+			return this.Reader.Fetch();
+		}
+
+		/// <summary>
 		/// Fetches the previously generated GUID with the specified sequence number.
 		/// </summary>
 		/// <param name="sequenceNumber">

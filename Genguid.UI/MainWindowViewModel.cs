@@ -98,7 +98,7 @@ namespace Genguid.UI
 
 		private void ScrambleDigitsAsync()
 		{
-			var scrambleDigitsWorker = new BackgroundWorker();
+			using var scrambleDigitsWorker = new BackgroundWorker();
 			scrambleDigitsWorker.DoWork += this.ScrambleDigits;
 			scrambleDigitsWorker.RunWorkerAsync();
 		}

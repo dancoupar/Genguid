@@ -6,6 +6,12 @@
 	public interface IGuidGenerationLogReader
 	{
 		/// <summary>
+		/// Retrieves a packet containing the most recently generated GUID and its associated
+		/// meta-data from the log.
+		/// </summary>
+		GuidPacket Fetch();
+
+		/// <summary>
 		/// Retrieves a packet containing the specified GUID and its associated meta-data from the
 		/// log.
 		/// </summary>

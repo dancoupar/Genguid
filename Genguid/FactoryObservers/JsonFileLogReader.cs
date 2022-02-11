@@ -26,6 +26,34 @@ namespace Genguid.FactoryObservers
 			this.cache = new Dictionary<long, GuidPacket>();
 		}
 
+		/// <summary>
+		/// Retrieves a packet containing the most recently generated GUID and its associated
+		/// meta-data from the log.
+		/// </summary>
+		public GuidPacket Fetch()
+		{
+			GuidPacket value = GuidPacket.NullPacket;
+
+			lock (readLock)
+			{
+				this.PopulateCache();
+
+				if (this.cache.Any())
+				{
+					value = this.cache[this.cache.Count];
+				}
+			}
+
+			return value;
+		}
+
+		/// <summary>
+		/// Retrieves a packet containing the specified GUID and its associated meta-data from the
+		/// log.
+		/// </summary>
+		/// <param name="sequenceNumber">
+		/// The sequence number of the GUID to be retrieved.
+		/// </param>
 		public GuidPacket Fetch(long sequenceNumber)
 		{
 			GuidPacket value = GuidPacket.NullPacket;
