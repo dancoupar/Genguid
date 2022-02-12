@@ -4,7 +4,6 @@ using Genguid.Formatters;
 using Prism.Commands;
 using System;
 using System.ComponentModel;
-using System.Threading;
 using System.Windows.Input;
 
 namespace Genguid.UI
@@ -17,7 +16,8 @@ namespace Genguid.UI
 		private long sequenceNumber;
 		private readonly ICommand previousCommand;
 		private readonly ICommand nextCommand;
-		private bool digitsScrambling;
+		
+		private readonly object currentGuidLock = new object();
 
 		public MainWindowViewModel()
 		{
@@ -78,52 +78,40 @@ namespace Genguid.UI
 
 		private void OnPrevious()
 		{
-			if (!digitsScrambling)
-			{
-				this.sequenceNumber--;
-				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
-			}
+			GuidPacket guidPacket = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber - 1);
+			this.SetGuid(guidPacket);			
 		}
 
 		private void OnNext()
 		{
-			if (!digitsScrambling)
+			if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
 			{
-				if (Factory.CurrentGuid.SequenceNumber == this.SequenceNumber)
-				{
-					Factory.GenerateNextGuid();
-					this.SetGuid(Factory.CurrentGuid);
-					this.ScrambleDigitsAsync();
-				}
-				else
-				{
-					this.sequenceNumber++;
-					this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
-				}
+				Factory.GenerateNextGuid();
+				GuidPacket guidPacket = Factory.CurrentGuid;
+				this.SetGuid(guidPacket);
+				this.ScrambleDigitsAsync(guidPacket);
+			}
+			else
+			{
+				this.sequenceNumber++;
+				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
 			}
 		}
 
-		private void ScrambleDigitsAsync()
+		private void ScrambleDigitsAsync(GuidPacket guidPacket)
 		{
-			// Scramble the digits without locking the UI thread.
-			// The flag prevents the GUID changing further whilst
-			// scrambling is taking place, avoiding race conditions.
-
-			digitsScrambling = true;
+			// Scramble the digits without locking the UI thread
 			using var scrambleDigitsWorker = new BackgroundWorker();
 			scrambleDigitsWorker.DoWork += this.ScrambleDigits;
-			scrambleDigitsWorker.RunWorkerAsync();
-			scrambleDigitsWorker.RunWorkerCompleted += (_, _) =>
-			{
-				digitsScrambling = false;
-			};
+			scrambleDigitsWorker.RunWorkerAsync(guidPacket);
 		}
 
-		private void ScrambleDigits(object? sender, EventArgs e)
+		private void ScrambleDigits(object? sender, DoWorkEventArgs e)
 		{
-			string targetString = this.currentGuid;
+			GuidPacket guidPacket = (GuidPacket)e.Argument!;
+			long sequenceNumberSnapshot = guidPacket.SequenceNumber;
 			byte digitCount = Formatter.Digits;
-			char[] chars = this.currentGuid.ToCharArray();
+			char[] chars = guidPacket.FormattedValue.ToCharArray();
 
 			// Assign a random scramble time for each digit in ticks.
 			// Possible scramble time is between 0.3 and 0.6 seconds.
@@ -142,9 +130,6 @@ namespace Genguid.UI
 
 			do
 			{
-				// Keep the loop running at a sensible speed
-				Thread.Sleep(10);
-
 				for (int i = 0; i < digitCount; i++)
 				{
 					if (!digitDone[i])
@@ -157,15 +142,29 @@ namespace Genguid.UI
 						}
 						else
 						{
-							chars[digitIndex] = targetString[digitIndex];
+							chars[digitIndex] = guidPacket.FormattedValue[digitIndex];
 							digitDone[i] = true;
 							doneCount++;
 						}
 					}
 				}
 
-				this.currentGuid = new string(chars);
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+				lock (currentGuidLock)
+				{
+					// Don't update the UI and abort if the sequence number has changed,
+					// as this means the user has requested a different GUID and there's
+					// danger of race conditions.
+
+					if (this.sequenceNumber == sequenceNumberSnapshot)
+					{
+						this.currentGuid = new string(chars);
+						this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+					}
+					else
+					{
+						break;
+					}
+				}				
 
 			} while (doneCount < digitCount);
 		}
@@ -194,11 +193,14 @@ namespace Genguid.UI
 
 		private void SetGuid(GuidPacket guidPacket)
 		{
-			this.currentGuid = guidPacket.FormattedValue;
-			this.sequenceNumber = guidPacket.SequenceNumber;
+			lock (currentGuidLock)
+			{
+				this.currentGuid = guidPacket.FormattedValue;
+				this.sequenceNumber = guidPacket.SequenceNumber;
 
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
+			}
 		}
 	}
 }
