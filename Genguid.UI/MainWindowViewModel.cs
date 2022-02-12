@@ -12,8 +12,9 @@ namespace Genguid.UI
 	{
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		private string currentGuid = Guid.Empty.ToString("b");
+		private string currentGuid;
 		private long sequenceNumber;
+		private string timestamp;
 		private readonly ICommand previousCommand;
 		private readonly ICommand nextCommand;
 		
@@ -21,6 +22,8 @@ namespace Genguid.UI
 
 		public MainWindowViewModel()
 		{
+			this.currentGuid = Guid.Empty.ToString("b");
+			this.timestamp = string.Empty;
 			this.previousCommand = new DelegateCommand(this.OnPrevious);
 			this.nextCommand = new DelegateCommand(this.OnNext);
 
@@ -58,7 +61,15 @@ namespace Genguid.UI
 			{
 				return this.currentGuid;
 			}
-		}		
+		}	
+		
+		public string Timestamp
+		{
+			get
+			{
+				return this.timestamp;
+			}
+		}
 
 		public ICommand PreviousButtonClickCommand
 		{
@@ -78,8 +89,11 @@ namespace Genguid.UI
 
 		private void OnPrevious()
 		{
-			GuidPacket guidPacket = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber - 1);
-			this.SetGuid(guidPacket);			
+			if (sequenceNumber > 1)
+			{
+				GuidPacket guidPacket = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber - 1);
+				this.SetGuid(guidPacket);
+			}
 		}
 
 		private void OnNext()
@@ -197,10 +211,20 @@ namespace Genguid.UI
 			{
 				this.currentGuid = guidPacket.FormattedValue;
 				this.sequenceNumber = guidPacket.SequenceNumber;
+				
+				bool isLatest = guidPacket == AppConfiguration.CurrentProvider.Factory.CurrentGuid;
+				this.timestamp = isLatest ? string.Empty : FormatTimestamp(guidPacket.TimeStamp);
 
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Timestamp)));
 			}
+		}
+
+		private static string FormatTimestamp(DateTimeOffset timestamp)
+		{
+			DateTime local = timestamp.LocalDateTime;
+			return $"{local.DayOfWeek}, {local.ToLongDateString()}, {local.ToLongTimeString()}";
 		}
 	}
 }
