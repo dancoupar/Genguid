@@ -26,9 +26,14 @@ namespace Genguid.UI
 			this.WindowState = WindowState.Minimized;
 		}
 
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
 		private void CloseButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.Close();
-		}
+		}		
 	}
 }

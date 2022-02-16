@@ -12,6 +12,7 @@
 		WindowStyle="None"		
 		BorderThickness="1"
 		BorderBrush="OrangeRed"
+		Loaded="Window_Loaded"
 		MouseDown="Window_MouseDown">
 	<Window.Resources>
 		<local:MainWindowViewModel x:Key="MainVM" />

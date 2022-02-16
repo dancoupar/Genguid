@@ -26,8 +26,7 @@ namespace Genguid.UI
 			this.timestamp = string.Empty;
 			this.previousCommand = new DelegateCommand(this.OnPrevious);
 			this.nextCommand = new DelegateCommand(this.OnNext);
-
-			AppConfiguration.CurrentProvider.Factory.Restore(AppConfiguration.CurrentProvider.GenerationLog);
+			
 			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid);
 		}
 
@@ -85,7 +84,7 @@ namespace Genguid.UI
 			{
 				return this.nextCommand;
 			}
-		}		
+		}
 
 		private void OnPrevious()
 		{
