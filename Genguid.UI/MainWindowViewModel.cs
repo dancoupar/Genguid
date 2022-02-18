@@ -1,5 +1,6 @@
 ﻿using Genguid.Configuration;
 using Genguid.Factories;
+using Genguid.FactoryObservers;
 using Genguid.Formatters;
 using Prism.Commands;
 using System;
@@ -29,9 +30,9 @@ namespace Genguid.UI
 			this.copyButtonClickCommand = new DelegateCommand(this.OnCopy);
 			this.previousButtonClickCommand = new DelegateCommand(this.OnPrevious);
 			this.nextButtonClickCommand = new DelegateCommand(this.OnNext);
-			GuidPacket initialGuid = AppConfiguration.CurrentProvider.Factory.CurrentGuid;
+			GuidPacket initialGuid = Factory.CurrentGuid;
 			bool showTimestamp = initialGuid != GuidPacket.NullPacket;
-			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid, showTimestamp);
+			this.SetGuid(initialGuid, showTimestamp);
 		}
 
 		private static GuidFactory Factory
@@ -47,6 +48,14 @@ namespace Genguid.UI
 			get
 			{
 				return AppConfiguration.CurrentProvider.Formatter;
+			}
+		}
+
+		private static GuidGenerationLog GenerationLog
+		{
+			get
+			{
+				return AppConfiguration.CurrentProvider.GenerationLog;
 			}
 		}
 
@@ -107,7 +116,7 @@ namespace Genguid.UI
 		{
 			if (sequenceNumber > 1)
 			{
-				GuidPacket guidPacket = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber - 1);
+				GuidPacket guidPacket = GenerationLog.Fetch(this.sequenceNumber - 1);
 				this.SetGuid(guidPacket, showTimestamp: true);
 			}
 		}
@@ -124,7 +133,7 @@ namespace Genguid.UI
 			else
 			{
 				this.sequenceNumber++;
-				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber), showTimestamp: true);
+				this.SetGuid(GenerationLog.Fetch(this.sequenceNumber), showTimestamp: true);
 			}
 		}
 
