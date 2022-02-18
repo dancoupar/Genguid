@@ -13,6 +13,11 @@ namespace Genguid.UI
 			InitializeComponent();
 		}
 
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
 		private void Window_MouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (e.ChangedButton == MouseButton.Left)
@@ -24,12 +29,7 @@ namespace Genguid.UI
 		private void MinimiseButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.WindowState = WindowState.Minimized;
-		}
-
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-
-		}
+		}		
 
 		private void CloseButton_Click(object sender, RoutedEventArgs e)
 		{

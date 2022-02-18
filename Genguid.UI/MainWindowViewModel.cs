@@ -4,6 +4,7 @@ using Genguid.Formatters;
 using Prism.Commands;
 using System;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Genguid.UI
@@ -12,22 +13,25 @@ namespace Genguid.UI
 	{
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		private string currentGuid;
+		private GuidPacket currentGuid;
+		private string displayedGuid;
 		private long sequenceNumber;
 		private string timestamp;
-		private readonly ICommand previousCommand;
-		private readonly ICommand nextCommand;
-		
-		private readonly object currentGuidLock = new object();
+		private readonly ICommand copyButtonClickCommand;
+		private readonly ICommand previousButtonClickCommand;
+		private readonly ICommand nextButtonClickCommand;		
+		private readonly object currentGuidLock = new();
 
 		public MainWindowViewModel()
 		{
-			this.currentGuid = Guid.Empty.ToString("b");
+			this.displayedGuid = string.Empty;
 			this.timestamp = string.Empty;
-			this.previousCommand = new DelegateCommand(this.OnPrevious);
-			this.nextCommand = new DelegateCommand(this.OnNext);
-			
-			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid, showTimestamp: true);
+			this.copyButtonClickCommand = new DelegateCommand(this.OnCopy);
+			this.previousButtonClickCommand = new DelegateCommand(this.OnPrevious);
+			this.nextButtonClickCommand = new DelegateCommand(this.OnNext);
+			GuidPacket initialGuid = AppConfiguration.CurrentProvider.Factory.CurrentGuid;
+			bool showTimestamp = initialGuid != GuidPacket.NullPacket;
+			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid, showTimestamp);
 		}
 
 		private static GuidFactory Factory
@@ -54,11 +58,11 @@ namespace Genguid.UI
 			}
 		}
 
-		public string CurrentGuid
+		public string DisplayedGuid
 		{
 			get
 			{
-				return this.currentGuid;
+				return this.displayedGuid;
 			}
 		}	
 		
@@ -70,11 +74,19 @@ namespace Genguid.UI
 			}
 		}
 
+		public ICommand CopyButtonClickCommand
+		{
+			get
+			{
+				return this.copyButtonClickCommand;
+			}
+		}
+
 		public ICommand PreviousButtonClickCommand
 		{
 			get
 			{
-				return this.previousCommand;
+				return this.previousButtonClickCommand;
 			}
 		}
 
@@ -82,8 +94,13 @@ namespace Genguid.UI
 		{
 			get
 			{
-				return this.nextCommand;
+				return this.nextButtonClickCommand;
 			}
+		}
+
+		private void OnCopy()
+		{
+			Clipboard.SetText(this.currentGuid.FormattedValue);
 		}
 
 		private void OnPrevious()
@@ -170,8 +187,8 @@ namespace Genguid.UI
 
 					if (this.sequenceNumber == sequenceNumberSnapshot)
 					{
-						this.currentGuid = new string(chars);
-						this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+						this.displayedGuid = new string(chars);
+						this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DisplayedGuid)));
 					}
 					else
 					{
@@ -208,11 +225,12 @@ namespace Genguid.UI
 		{
 			lock (currentGuidLock)
 			{
-				this.currentGuid = guidPacket.FormattedValue;
-				this.sequenceNumber = guidPacket.SequenceNumber;								
-				this.timestamp = showTimestamp ? FormatTimestamp(guidPacket.TimeStamp) : string.Empty;
+				this.currentGuid = guidPacket;
+				this.displayedGuid = this.currentGuid.FormattedValue;
+				this.sequenceNumber = this.currentGuid.SequenceNumber;
+				this.timestamp = showTimestamp ? FormatTimestamp(this.currentGuid.TimeStamp) : string.Empty;
 
-				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.DisplayedGuid)));
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Timestamp)));
 			}
