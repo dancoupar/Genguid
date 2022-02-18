@@ -27,7 +27,7 @@ namespace Genguid.UI
 			this.previousCommand = new DelegateCommand(this.OnPrevious);
 			this.nextCommand = new DelegateCommand(this.OnNext);
 			
-			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid);
+			this.SetGuid(AppConfiguration.CurrentProvider.Factory.CurrentGuid, showTimestamp: true);
 		}
 
 		private static GuidFactory Factory
@@ -91,7 +91,7 @@ namespace Genguid.UI
 			if (sequenceNumber > 1)
 			{
 				GuidPacket guidPacket = AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber - 1);
-				this.SetGuid(guidPacket);
+				this.SetGuid(guidPacket, showTimestamp: true);
 			}
 		}
 
@@ -101,13 +101,13 @@ namespace Genguid.UI
 			{
 				Factory.GenerateNextGuid();
 				GuidPacket guidPacket = Factory.CurrentGuid;
-				this.SetGuid(guidPacket);
+				this.SetGuid(guidPacket, showTimestamp: false);
 				this.ScrambleDigitsAsync(guidPacket);
 			}
 			else
 			{
 				this.sequenceNumber++;
-				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber));
+				this.SetGuid(AppConfiguration.CurrentProvider.GenerationLog.Fetch(this.sequenceNumber), showTimestamp: true);
 			}
 		}
 
@@ -204,15 +204,13 @@ namespace Genguid.UI
 			return -1;
 		}
 
-		private void SetGuid(GuidPacket guidPacket)
+		private void SetGuid(GuidPacket guidPacket, bool showTimestamp)
 		{
 			lock (currentGuidLock)
 			{
 				this.currentGuid = guidPacket.FormattedValue;
-				this.sequenceNumber = guidPacket.SequenceNumber;
-				
-				bool isLatest = guidPacket == AppConfiguration.CurrentProvider.Factory.CurrentGuid;
-				this.timestamp = isLatest ? string.Empty : FormatTimestamp(guidPacket.TimeStamp);
+				this.sequenceNumber = guidPacket.SequenceNumber;								
+				this.timestamp = showTimestamp ? FormatTimestamp(guidPacket.TimeStamp) : string.Empty;
 
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.CurrentGuid)));
 				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.SequenceNumber)));
