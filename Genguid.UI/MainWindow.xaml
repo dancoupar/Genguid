@@ -12,10 +12,11 @@
 		WindowStyle="None"		
 		BorderThickness="1"
 		BorderBrush="OrangeRed"
-		Loaded="Window_Loaded"
 		MouseDown="Window_MouseDown">
+	<Window.DataContext>
+		<local:MainWindowViewModel/>
+	</Window.DataContext>
 	<Window.Resources>
-		<local:MainWindowViewModel x:Key="MainVM" />
 		<Style TargetType="{x:Type Button}">
 			<Setter Property="Background" Value="#1a1a1a"/>
 			<Setter Property="Foreground" Value="Orange" />
@@ -47,16 +48,16 @@
 		<Viewbox Stretch="Fill" Margin="20,30,20,40">
 			<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-					<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="Lucida Console" FontSize="10" Foreground="Orange" />
-					<Label x:Name="timestampLabel" Content="{Binding Timestamp, Mode=OneWay, Source={StaticResource MainVM}}" FontFamily="Lucida Console" FontSize="10" Foreground="Orange" />
+					<Label x:Name="numberLabel" ContentStringFormat="#{0}" Content="{Binding SequenceNumber}" FontFamily="Lucida Console" FontSize="10" Foreground="Orange" />
+					<Label x:Name="timestampLabel" Content="{Binding Timestamp}" FontFamily="Lucida Console" FontSize="10" Foreground="Orange" />
 				</StackPanel>
-				<TextBox x:Name="guidBox" Background="Transparent" BorderThickness="0" Text="{Binding DisplayedGuid, Mode=OneWay, Source={StaticResource MainVM}}" Margin="0,0,0,40" IsReadOnly="True" FontFamily="Lucida Console" FontSize="20" Foreground="OrangeRed" />
+				<TextBox x:Name="guidBox" Background="Transparent" BorderThickness="0" Text="{Binding DisplayedGuid, Mode=OneWay}" Margin="0,0,0,40" IsReadOnly="True" FontFamily="Lucida Console" FontSize="20" Foreground="OrangeRed" />
 			</StackPanel>
 		</Viewbox>
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 20 20">
-			<Button x:Name="copyButton" FontFamily="Segoe UI Symbol" Content="&#xE16F;" FontSize="20" Margin="0,0,10,0" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding CopyButtonClickCommand, Mode=OneWay, Source={StaticResource MainVM}}" ToolTip="Copy to Clipboard" />
-			<Button x:Name="previousButton" FontFamily="Segoe UI Symbol" Content="&#xE112;" FontSize="20" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding PreviousButtonClickCommand, Mode=OneWay, Source={StaticResource MainVM}}" ToolTip="Previous" />
-			<Button x:Name="nextButton" FontFamily="Segoe UI Symbol" Content="&#xE111;" FontSize="20" Margin="10,0,0,0" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding NextButtonClickCommand, Mode=OneWay, Source={StaticResource MainVM}}" ToolTip="Next"/>
+			<Button x:Name="copyButton" FontFamily="Segoe UI Symbol" Content="&#xE16F;" FontSize="20" Margin="0,0,10,0" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding CopyButtonClickCommand}" ToolTip="Copy to Clipboard" />
+			<Button x:Name="previousButton" FontFamily="Segoe UI Symbol" Content="&#xE112;" FontSize="20" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding PreviousButtonClickCommand}" ToolTip="Previous" />
+			<Button x:Name="nextButton" FontFamily="Segoe UI Symbol" Content="&#xE111;" FontSize="20" Margin="10,0,0,0" Height="40" Width="40" DockPanel.Dock="Right" Command="{Binding NextButtonClickCommand}" ToolTip="Next"/>
 		</StackPanel>
 	</Grid>
 </Window>
