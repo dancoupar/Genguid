@@ -1,5 +1,5 @@
 # Introduction
-Genguid is a glorified extensible GUID generator incorporating logging functionality.
+Genguid is a glorified extensible GUID/UUID generator incorporating logging functionality.
 
 # Getting Started
 Clone the repository in Visual Studio and build the solution to produce executables. There are two Windows-only executables which can be used to launch Genguid:
